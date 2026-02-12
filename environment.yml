@@ -1,5 +1,5 @@
 # conda env create -f environment.yml
-name: 532
+name: "532"
 channels:
   - conda-forge
   - defaults
