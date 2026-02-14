@@ -68,10 +68,9 @@ Because the dataset is clean and tabular, it supports filtering, grouping, and c
 
 ## Section 3: Research Questions & Usage Scenarios
 
-
 ### Persona
 
-**Dr. Amina Patel** is a university student wellness coordinator. She is responsible for promoting mental health awareness and identifying behavioral risks among students. She wants data-driven insights to support intervention programs and policy decisions related to digital well-being.
+Dr. Amina Patel is a university student wellness coordinator. She is responsible for promoting mental health awareness and identifying behavioral risks among students. She wants data-driven insights to support intervention programs and policy decisions related to digital well-being.
 
 ---
 
@@ -79,38 +78,32 @@ Because the dataset is clean and tabular, it supports filtering, grouping, and c
 
 Dr. Patel is preparing a mental health awareness campaign focused on digital habits. She wants to understand which groups of students are most vulnerable to social media addiction and how excessive usage impacts sleep, academic performance, and mental health.
 
-Using the dashboard, she filters the data by academic level and gender to explore patterns in addiction scores. She compares average daily usage hours across platforms and investigates whether higher usage correlates with lower sleep hours or mental health scores.
+Using the dashboard, she filters the data by academic level and gender to explore patterns in addiction scores. She compares average daily usage hours across platforms to identify which are associated with the highest dependency risks. She then investigates whether higher addiction scores correlate with lower sleep hours, poorer mental health outcomes, or reduced academic performance.
 
-The interactive dashboard allows her to identify high-risk groups and generate evidence-based recommendations for workshops, awareness campaigns, and counseling support initiatives.
-
----
+Curious about how other institutions are tackling the same problem, she uses the dashboard to identify countries with addiction profiles similar to her university's, then researches the intervention strategies those countries' universities have adopted. This allows her to benchmark her own programs against international best practices and bring evidence-based recommendations back to her institution.git 
 
 ### Research Questions
 
 The dashboard is designed to help answer the following key questions:
 
-1. How does average daily social media usage relate to addiction levels?
-2. Are certain demographic groups (age, gender, academic level) more vulnerable to addiction?
-3. Does higher addiction correlate with lower sleep duration or poorer mental health?
-4. Do students who report academic performance issues also have higher addiction scores?
-
----
+1. Are certain demographic groups (age, gender, academic level) more vulnerable to social media addiction?
+2. Does higher addiction correlate with poorer outcomes across sleep duration, mental health scores, and academic performance?
+3. Do certain social media platforms show stronger associations with higher addiction scores than others?
+4. Which countries have similar student addiction profiles, and what intervention strategies have universities in those countries adopted?
 
 ### User Stories / Jobs To Be Done (JTBD)
 
-**User Story 1**  
-As a wellness coordinator, I want to compare addiction scores across different academic levels so that I can identify which groups require targeted intervention.
+**User Story 1: **
+As a wellness coordinator, I want to filter and compare addiction scores across demographic groups such as age, gender, and academic level, so that I can identify which student populations are most at risk and prioritize them for targeted intervention.
 
-**User Story 2**  
-As a university counselor, I want to examine the relationship between daily usage hours and sleep duration so that I can understand whether excessive social media use is impacting students' rest.
+**User Story 2: **
+As a wellness coordinator, I want to visualize the relationship between addiction scores and key outcome variables. In a single view  I want to look at sleep duration, mental health scores, and academic performance so that I can build a comprehensive case for why digital well-being programs.
 
-**User Story 3**  
-As a policy decision-maker, I want to filter students by platform usage and addiction score so that I can determine whether certain platforms are associated with higher dependency risks.
+**User Story 3: **
+As a wellness coordinator, I want to compare average addiction scores across different social media platforms, so that I can determine whether certain platforms warrant platform-specific awareness messaging in my campaigns.
 
-**User Story 4**  
-When preparing a mental health awareness report, I want to visualize how addiction score correlates with mental health score so that I can support evidence-based recommendations.
-
----
+**User Story 4: **
+As a wellness coordinator, I want to identify countries whose student populations show addiction profiles similar to my university's, so that I can research the intervention strategies their universities are using and adapt best practices for my own institution.
 
 ### How Users Will Interact with the App
 
