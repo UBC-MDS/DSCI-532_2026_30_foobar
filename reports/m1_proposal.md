@@ -128,6 +128,8 @@ These interactions allow users to move from general exploration to targeted deci
 
 ## Section 4: Exploratory Data Analysis
 
+## 4. Exploratory Data Analysis
+
 To demonstrate that our dataset can support meaningful decision-making, we focused on the following user story:
 
 > As a university counselor, I want to examine the relationship between daily usage hours and sleep duration so that I can understand whether excessive social media use is impacting students' rest.
@@ -145,41 +147,59 @@ The scatter plot shows **Avg_Daily_Usage_Hours** on the x-axis and **Sleep_Hours
 
 The visualization reveals a clear **negative relationship** between usage and sleep duration. As daily social media usage increases, reported sleep hours decrease. Students spending 7–8 hours per day on social media tend to sleep significantly less than those spending 2–3 hours.
 
-This pattern suggests that excessive social media use may contribute to sleep reduction, which is strongly linked to mental health and academic performance outcomes.
+The regression trend line further supports this downward pattern, indicating a consistent inverse association between usage intensity and sleep.
 
 ---
 
-### Visualization 2: Average Addiction Score by Usage Category
+### Visualization 2: Distribution of Addiction Scores by Usage Category
 
-![Addiction by Usage](../img/addiction_usage.png)
+![Addiction Distribution](../img/addiction_scores_usage_category.png)
 
 Students were grouped into three usage categories:
 - Low (0–2 hours)
 - Moderate (2–5 hours)
 - High (>5 hours)
 
-The bar chart shows that:
+The boxplot shows that the distribution of addiction scores shifts upward as usage increases. High-usage students consistently exhibit higher addiction scores, with less overlap between low and high usage groups.
 
-- Low usage students have an average addiction score of approximately **2.5**
-- Moderate usage students have an average addiction score of approximately **5.5**
-- High usage students have an average addiction score of approximately **7.8**
+This demonstrates that higher screen time is strongly associated with greater dependency severity.
 
-This demonstrates a strong positive association between time spent on social media and addiction severity.
+---
+
+### Visualization 3: Average Addiction Score by Usage Category
+
+![Addiction by Usage](../img/addiction_usage.png)
+
+The bar chart confirms this trend quantitatively:
+
+- Low usage students: ~2.5 average addiction score
+- Moderate usage students: ~5.5 average addiction score
+- High usage students: ~7.8 average addiction score
+
+This stepwise increase suggests a strong positive relationship between daily usage and addiction severity.
+
+---
+
+### Visualization 4: Addiction Score by Platform and Academic Level
+
+![Platform Heatmap](../img/avg_addiction_scores.png)
+
+The heatmap reveals variation in addiction scores across platforms and academic levels. Certain platform–academic combinations exhibit higher average addiction scores, suggesting that risk patterns may differ across student subgroups.
+
+This supports the feasibility of interactive filtering in the dashboard to identify high-risk groups.
 
 ---
 
 ### Decision-Making Implications
 
-These results confirm that the dataset supports our proposed dashboard functionality.
-
-Specifically:
+The exploratory analysis confirms that the dataset meaningfully supports our proposed dashboard functionality:
 
 - Increased usage hours are associated with reduced sleep duration.
 - Higher usage groups show substantially higher addiction scores.
-- The data supports filtering, subgroup comparison, and risk identification.
+- Addiction patterns vary across platforms and academic levels.
+- The data structure allows filtering, subgroup comparison, and correlation exploration.
 
-This evidence demonstrates that the dashboard can help counselors and policymakers identify high-risk behavioral patterns and design targeted digital well-being interventions.
-
+These findings demonstrate that the dashboard can effectively help counselors, educators, and policymakers identify high-risk behavioral patterns and design targeted digital well-being interventions.
 
 ## Section 5: App Sketch & Description
 
