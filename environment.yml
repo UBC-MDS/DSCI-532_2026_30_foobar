@@ -11,6 +11,7 @@ dependencies:
   - shinywidgets>=0.3.0
   - dash>=2.18.1
   - plotly>=5.24.1
+  - jupyterlab>=4.0
   - pip
   - pip:
     - kagglehub  
