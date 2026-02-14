@@ -10,61 +10,52 @@
 
 ## Section 2: Description of the Data
 
-We use the **Students Social Media Addiction Dataset**, from kaggle which contains structured survey responses capturing students’ demographic characteristics, social media usage behavior, and indicators of addiction.
+We use the [Students Social Media Addiction Dataset](https://www.kaggle.com/datasets/zahranusratt/student-social-media-addiction-analysis-dataset) from kaggle which contains survey responses capturing students’ demographics, social media usage behavior, indicators of addiction, and more.
 
-The dataset contains **705 observations (rows)** and **13 variables (columns)**. Each row represents one individual student’s survey response.
+The dataset contains 705 observations (rows) and 13 variables (columns). Each row represents one individual student’s survey response. The variables can be grouped into three major categories:
 
-### Key Variables
-
-The variables can be grouped into three major categories:
-
-####  Demographic Variables
-- **Age**
-- **Gender**
-- **Academic_Level**
-- **Country**
-- **Relationship_Status**
+**Student Demographic:**
+- `Age`
+- `Gender`
+- `Academic_Level`
+- `Country`
+- `Relationship_Status`
 
 These variables allow us to compare addiction patterns across different student subgroups (e.g., age groups, academic levels, or countries).
 
----
-
-#### Social Media Usage Behavior
-- **Avg_Daily_Usage_Hours** – Average number of hours spent on social media per day.
-- **Most_Used_Platform** – Primary platform used (e.g., Instagram, TikTok, etc.).
-- **Conflicts_Over_Social_Media** – Whether usage causes interpersonal conflicts.
+**Social Media Usage Behavior:**
+- `Avg_Daily_Usage_Hours` – Average number of hours spent on social media per day.
+- `Most_Used_Platform` – Primary platform used (e.g., Instagram, TikTok, etc.).
+- `Conflicts_Over_Social_Media` – Whether usage causes interpersonal conflicts.
 
 These variables help measure the intensity and behavioral patterns of social media use.
 
----
-
-####  Academic & Psychological Impact Indicators
-- **Affects_Academic_Performance** – Whether social media impacts studies.
-- **Sleep_Hours_Per_Night** – Average sleep duration.
-- **Mental_Health_Score** – Numerical indicator of mental well-being.
-- **Addicted_Score** – Numerical score quantifying addiction severity.
+**Academic & Psychological Impact:**
+- `Affects_Academic_Performance` – Whether social media impacts studies.
+- `Sleep_Hours_Per_Night` – Average sleep duration.
+- `Mental_Health_Score` – Numerical indicator of mental well-being.
+- `Addicted_Score` – Numerical score of addiction severity.
 
 These variables are central to our problem, as they measure the consequences of excessive social media use on academic performance, sleep quality, and mental health.
 
----
 
 ### Relevance to the Problem
 
-This dataset is highly relevant to our dashboard’s goal of supporting healthier digital behavior among students.
+This dataset is highly relevant to our dashboard’s goal of supporting healthier social media usage among students.
 
-- The **Addicted_Score** provides a measurable indicator of addiction severity.
-- **Avg_Daily_Usage_Hours** allows us to examine whether increased usage correlates with higher addiction.
-- **Sleep_Hours_Per_Night** and **Mental_Health_Score** help assess psychological and physiological effects.
-- **Affects_Academic_Performance** directly connects usage to educational outcomes.
+- `Addicted_Score` provides a measurable indicator of addiction severity.
+- `Avg_Daily_Usage_Hours` allows us to see whether increased usage correlates with higher addiction.
+- `Sleep_Hours_Per_Night` and `Mental_Health_Score` help us understand psychological and physiological effects.
+- `Affects_Academic_Performance` is a direct measure of educational outcomes.
 
-By integrating these variables into an interactive dashboard, users (e.g., educators, counselors, or policymakers) can:
+By integrating these variables into an interactive dashboard, users (e.g., educators, counselors, or students) can:
 
 - Identify high-risk student groups.
 - Compare addiction levels across demographic categories.
 - Explore relationships between screen time, sleep, and mental health.
-- Support data-driven interventions for digital well-being.
+- Support data-driven interventions and self regulations.
 
-Because the dataset is clean and tabular, it supports filtering, grouping, and comparative visualizations, making it well-suited for an interactive decision-support dashboard.
+Because the dataset is clean and tabular, it supports filtering, grouping, and comparative visualizations, making it well-suited for an interactive visualization dashboard.
 
 ## Section 3: Research Questions & Usage Scenarios
 
@@ -72,8 +63,6 @@ Because the dataset is clean and tabular, it supports filtering, grouping, and c
 ### Persona
 
 **Dr. Amina Patel** is a university student wellness coordinator. She is responsible for promoting mental health awareness and identifying behavioral risks among students. She wants data-driven insights to support intervention programs and policy decisions related to digital well-being.
-
----
 
 ### Usage Scenario
 
@@ -83,7 +72,6 @@ Using the dashboard, she filters the data by academic level and gender to explor
 
 The interactive dashboard allows her to identify high-risk groups and generate evidence-based recommendations for workshops, awareness campaigns, and counseling support initiatives.
 
----
 
 ### Research Questions
 
@@ -93,8 +81,6 @@ The dashboard is designed to help answer the following key questions:
 2. Are certain demographic groups (age, gender, academic level) more vulnerable to addiction?
 3. Does higher addiction correlate with lower sleep duration or poorer mental health?
 4. Do students who report academic performance issues also have higher addiction scores?
-
----
 
 ### User Stories / Jobs To Be Done (JTBD)
 
@@ -109,8 +95,6 @@ As a policy decision-maker, I want to filter students by platform usage and addi
 
 **User Story 4**  
 When preparing a mental health awareness report, I want to visualize how addiction score correlates with mental health score so that I can support evidence-based recommendations.
-
----
 
 ### How Users Will Interact with the App
 
@@ -136,19 +120,17 @@ To demonstrate that our dataset can support meaningful decision-making, we focus
 We conducted exploratory data analysis in:
 `notebooks/eda_analysis.ipynb`
 
----
 
 ### Visualization 1: Social Media Usage vs Sleep Duration
 
 ![Usage vs Sleep](../img/usage_sleep.png)
 
-The scatter plot shows **Avg_Daily_Usage_Hours** on the x-axis and **Sleep_Hours_Per_Night** on the y-axis.
+The scatter plot shows `Avg_Daily_Usage_Hours` on the x-axis and `Sleep_Hours_Per_Night` on the y-axis.
 
-The visualization reveals a clear **negative relationship** between usage and sleep duration. As daily social media usage increases, reported sleep hours decrease. Students spending 7–8 hours per day on social media tend to sleep significantly less than those spending 2–3 hours.
+The visualization reveals a clear negative relationship between usage and sleep duration. As daily social media usage increases, reported sleep hours decrease. Students spending 7–8 hours per day on social media tend to sleep significantly less than those spending 2–3 hours.
 
 The regression trend line further supports this downward pattern, indicating a consistent inverse association between usage intensity and sleep.
 
----
 
 ### Visualization 2: Distribution of Addiction Scores by Usage Category
 
@@ -163,7 +145,6 @@ The boxplot shows that the distribution of addiction scores shifts upward as usa
 
 This demonstrates that higher screen time is strongly associated with greater dependency severity.
 
----
 
 ### Visualization 3: Average Addiction Score by Usage Category
 
@@ -177,17 +158,14 @@ The bar chart confirms this trend quantitatively:
 
 This stepwise increase suggests a strong positive relationship between daily usage and addiction severity.
 
----
 
 ### Visualization 4: Addiction Score by Platform and Academic Level
 
 ![Platform Heatmap](../img/avg_addiction_scores.png)
 
-The heatmap reveals variation in addiction scores across platforms and academic levels. Certain platform–academic combinations exhibit higher average addiction scores, suggesting that risk patterns may differ across student subgroups.
+The heatmap reveals variation in addiction scores across platforms and academic levels. Certain platform–academic combinations have higher average addiction scores, suggesting that risk patterns may differ across student subgroups.
 
-This supports the feasibility of interactive filtering in the dashboard to identify high-risk groups.
-
----
+This supports the importance of interactive filtering in the dashboard to identify high-risk groups.
 
 ### Decision-Making Implications
 
