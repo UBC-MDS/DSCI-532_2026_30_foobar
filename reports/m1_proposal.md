@@ -5,6 +5,7 @@ These examples are provided to help you understand the expected depth and style 
 ## Section 1: Motivation and Purpose
 
 > **Our role:** Data scientists. We translate survey responses into meaningful insights that support student well-being.
+>
 > **Target audience:** School administrators, counselors, undergraduate students, and graduate students who are affected by or responsible for understanding social medis addicition among students.
 
 > It is no suprise that social media is apart of most people's life, especially undergraduate and graduate students, but how much is too much and how does it affect their well-being and grades? Many undergraduate and graduate students don't realize how the use of social media might affect their mental state and/or academic performance. While students may be struggling with the effect of social media use, school administrators and counselors also need a clear way to explore this information so they can understand what's happening and offer support accordingly. To address this challenge, we propose building a data visualization app that helps our target audience explore patterns/relationships across academic performance, sleep hours, daily social media usage, country, and most used platforms. This allow students to reflect on their own habits while giving school administrators and counselors a clearer picture of which groups may need additional support.
@@ -68,6 +69,8 @@ These examples are provided to help you understand the expected depth and style 
 
 ## Section 5: App Sketch & Description
 
-![Dashboard](sketch.png "App Sketch")
+![Dashboard Sketch](../img/dash_sketch.png "App Sketch")
 
-> The app contains a landing page that shows the distribution (depending on data type, bar chart, density chart etc) of dataset factors (hypertension, physical disabilities etc.) colored coded according to whether patients showed up or didn't show up for an appointment. From a dropdown list, users can filter out variables from the distribution display, by patient demographics (i.e. only show female patients), by appointment data (i.e. if SMS was sent), and finally by the date range of appointments. A different dropdown menu will allow users to re-order variables according to the probability of patients being a no-show or in alphabetical order to co-morbidities. Users can compare the distribution of co-morbidities by scrolling down through the app interface.
+> The dashboard contains a landing page that shows the key summary metrics at the top such as total students, average daily usage, average sleep hours, average addiction score, and most-used platform. This gives users an immediate overview of the dataset. On the left side, an "About" section is included to explain the purpose of the dashboard. Directly below it, an interactive filter panel allows users to refine the display by selecting specific social media platforms, adjusting age ranges, gender, academic level, or country. All charts on the page update dynamically as the filters are modified. The main interface displays a series of visual components, including bar chats, pie charts, histograms, and scatter plots that show academic impact, sleeping distribution, the relationship between addictive and mental health scores with sleep hours, and the relationship between mental health score and conflicts over social media with family, friends, or partners. Users can compare patterns/distributions across wellbeing indicators and usage behaviour by scrolling down through the app interface. 
+>
+>**Disclaimer:** At least eight components will be implemented with the possibility of adding more if we have capacity to build more features. 
