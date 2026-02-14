@@ -1,6 +1,4 @@
-# Proposal Examples
-
-These examples are provided to help you understand the expected depth and style of your proposal. You do not need to follow them exactly, but your sections should cover similar ground. Use the lecture materials to better motivate your proposal.
+# Proposal 
 
 ## Section 1: Motivation and Purpose
 
