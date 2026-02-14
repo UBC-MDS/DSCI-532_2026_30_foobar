@@ -14,4 +14,5 @@ dependencies:
   - jupyterlab>=4.0
   - pip
   - pip:
-    - kagglehub  
+    - kagglehub
+    - vl-convert-python
