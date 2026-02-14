@@ -1,0 +1,16 @@
+# conda env create -f environment.yml
+name: "532"
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - pandas>=2.0
+  - altair>=5.0
+  - shiny>=1.0.0
+  - shinywidgets>=0.3.0
+  - dash>=2.18.1
+  - plotly>=5.24.1
+  - pip
+  - pip:
+    - kagglehub  
