@@ -1,0 +1,1 @@
+This project is an interactive dashboard to visualize the correlations between social media usage of students, their well being, and their academic performance. This dashboard enables users to identify high-risk behavior and support targeted interventions or self-regulations.

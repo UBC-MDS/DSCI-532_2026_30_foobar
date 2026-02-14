@@ -1,8 +1,10 @@
-# DSCI-532_2026_30_social-media-addiction
+# Social Media Addiction Analytics Dashboard
 
 ### Project Summary
 
-TODO
+This project presents an interactive data visualization dashboard designed to explore patterns in social media usage and addiction among students. The dashboard allows users to explore the correlation between daily usage hours, sleep duration, mental health scores, academic performance, and preferred platforms.
+
+The dashboard is intended for school administrators, counselors, and students seeking to better understand digital behavior and its impact on well-being and academic outcomes. Through interactive filtering and comparative visualizations, users can potentially identify high-risk groups and conduct targeted interventions or self regulation making based on this.
 
 ### Setup
 First, clone the repository and navigate into the project directory:
@@ -24,5 +26,9 @@ Run the below command to download the dataset:
 ```bash
 python src/download_data.py
 ```
+## Team Members
 
-
+- Yin Tiantong  
+- Lee Wai Yan  
+- Ssemakula Peter Wasswa  
+- Fontelera Roganci  
