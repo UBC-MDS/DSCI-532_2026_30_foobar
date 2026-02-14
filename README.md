@@ -26,6 +26,13 @@ Run the below command to download the dataset:
 ```bash
 python src/download_data.py
 ```
+To run the shiny app locally, navigate and run shiny with the following command:
+```bash
+cd src/
+shiny run app.py
+```
+You will be able to access the app at the link displayed in the command line.
+
 ## Team Members
 
 - Yin Tiantong  
