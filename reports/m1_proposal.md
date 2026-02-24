@@ -178,7 +178,7 @@ These findings demonstrate that the dashboard can effectively help counselors, e
 
 ## Section 5: App Sketch & Description
 
-![Dashboard Sketch](../img/dash_sketch.png "App Sketch")
+![Dashboard Sketch](../img/sketch.png "App Sketch")
 
 > The dashboard contains a landing page that shows the key summary metrics at the top such as total students, average daily usage, average sleep hours, average addiction score, and most-used platform. This gives users an immediate overview of the dataset. On the left side, an "About" section is included to explain the purpose of the dashboard. Directly below it, an interactive filter panel allows users to refine the display by selecting specific social media platforms, adjusting age ranges, gender, academic level, or country. All charts on the page update dynamically as the filters are modified. The main interface displays a series of visual components, including bar chats, pie charts, histograms, and scatter plots that show academic impact, sleeping distribution, the relationship between addictive and mental health scores with sleep hours, and the relationship between mental health score and conflicts over social media with family, friends, or partners. Users can compare patterns/distributions across wellbeing indicators and usage behaviour by scrolling down through the app interface. 
 >
