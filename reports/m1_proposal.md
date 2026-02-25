@@ -97,7 +97,7 @@ The dashboard is designed to help answer the following key questions:
 As a wellness coordinator, I want to filter and compare addiction scores across demographic groups such as age, gender, and academic level, so that I can identify which student populations are most at risk and prioritize them for targeted intervention.
 
 **User Story 2: **
-As a wellness coordinator, I want to visualize the relationship between addiction scores and key outcome variables. In a single view  I want to look at sleep duration, mental health scores, and academic performance so that I can build a comprehensive case for why digital well-being programs.
+As a wellness coordinator, I want to visualize the relationship between addiction scores and key outcome variables. In a single view git I want to look at sleep duration, mental health scores, and academic performance so that I can build a comprehensive case for why digital well-being programs.
 
 **User Story 3: **
 As a wellness coordinator, I want to compare average addiction scores across different social media platforms, so that I can determine whether certain platforms warrant platform-specific awareness messaging in my campaigns.
