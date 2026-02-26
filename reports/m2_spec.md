@@ -35,13 +35,13 @@
 
 Example:
 
-```{mermaid}
+```mermaid
+flowchart TD
   A[/input_gender/] --> F{{filtered_df}}
   B[/input_age/] --> F
   C[/input_academiclvl/] --> F
   D[/input_country/] --> F
   E[/input_platform/] --> F
-
   F --> P1([plot_AAP])
   F --> P2([plot_academiclvl])
   F --> P3([plot_platformdist])
