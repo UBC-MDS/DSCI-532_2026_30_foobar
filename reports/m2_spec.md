@@ -35,9 +35,7 @@
 
 Example:
 
-````markdown
-```mermaid
-flowchart TD
+```{mermaid}
   A[/input_gender/] --> F{{filtered_df}}
   B[/input_age/] --> F
   C[/input_academiclvl/] --> F
@@ -55,7 +53,6 @@ flowchart TD
   F --> P9([txt_most_used_platf])
   F --> P10([Map])
 ```
-````
 
 Verify your diagram satisfies the reactivity requirements in Phase 3.2 before you start coding.
 
