@@ -11,11 +11,24 @@ import pandas as pd
 import plotly.graph_objects as go
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, output_widget
+from pathlib import Path
 
 
 # ── DATA ─────────────────────────────────────────────────────────────
 
-df = pd.read_csv("../data/raw/Students Social Media Addiction.csv")
+# Build a robust path (works locally + on Connect Cloud)
+HERE = Path(__file__).resolve().parent        # src/
+ROOT = HERE.parent                           # project root
+DATA_PATH = ROOT / "data" / "raw" / "Students-Social-Media-Addiction.csv"
+
+if not DATA_PATH.exists():
+    raise FileNotFoundError(
+        f"Dataset not found at {DATA_PATH}. "
+        "Make sure the CSV is committed inside data/raw/."
+    )
+
+df = pd.read_csv(DATA_PATH)
+
 
 AGE_MIN = int(df["Age"].min())
 AGE_MAX = int(df["Age"].max())
