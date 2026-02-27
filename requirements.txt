@@ -13,6 +13,7 @@ geoarrow-pandas
 pyogrio
 plotnine
 plotly>=5.24.1
+anywidget>=0.9.13
 seaborn
 matplotlib
 
