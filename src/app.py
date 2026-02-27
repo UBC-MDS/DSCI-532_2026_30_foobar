@@ -15,7 +15,7 @@ from shinywidgets import render_plotly, output_widget
 
 # ── DATA ─────────────────────────────────────────────────────────────
 
-df = pd.read_csv("../data/raw/Students Social Media Addiction.csv")
+df = pd.read_csv("../data/raw/Students-Social-Media-Addiction.csv")
 
 AGE_MIN = int(df["Age"].min())
 AGE_MAX = int(df["Age"].max())
