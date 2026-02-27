@@ -8,7 +8,7 @@ Open:     http://127.0.0.1:8000
 # ── IMPORTS ───────────────────────────────────────────────────────────
 
 import pandas as pd
-import plotly.graph_objects as go
+import plotly.express as px
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, output_widget
 from pathlib import Path
@@ -32,6 +32,15 @@ df = pd.read_csv(DATA_PATH)
 
 AGE_MIN = int(df["Age"].min())
 AGE_MAX = int(df["Age"].max())
+
+df_all_country = df.groupby("Country", as_index=False).agg({
+    "Student_ID": "count",
+    "Avg_Daily_Usage_Hours": "mean",
+    "Sleep_Hours_Per_Night": "mean",
+    "Addicted_Score": "mean",
+})
+MIN_SCORE = df_all_country["Addicted_Score"].min()
+MAX_SCORE = df_all_country["Addicted_Score"].max()
 
 
 # ── UI ───────────────────────────────────────────────────────────────
@@ -63,28 +72,16 @@ app_ui = ui.page_fluid(
         # ── MAIN AREA ─────────────────────────────────────────────────
 
         # Row 1: Summary stat tiles
-        # TODO: Update value_box text/icons and wire up to real server output
         ui.layout_columns(
-            ui.value_box("Total Students",      "[ count ]"),
-            ui.value_box("Avg Daily Usage",     "[ X.X h ]"),
-            ui.value_box("Avg Sleep Hours",     "[ X.X h ]"),
-            ui.value_box("Avg Addiction Score", "[ X.X ]"),
+            ui.value_box("Total Students", ui.output_text("tile_students")),
+            ui.value_box("Avg Daily Usage", ui.output_text("tile_usage")),
+            ui.value_box("Avg Sleep Hours", ui.output_text("tile_sleep")),
+            ui.value_box("Avg Addiction Score", ui.output_text("tile_addiction")),
             fill=False,
         ),
 
-        # Row 2: World map placeholder
-        ui.card(
-            ui.card_header("Avg Addiction Score by Country"),
-            # TODO: Replace ui.p with output_widget("map_chart")
-            # and implement map_chart in the server
-            ui.p(
-                "[ World choropleth map goes here — avg addiction score per country ]",
-                style="color: gray; font-style: italic; padding: 60px; text-align: center;",
-            ),
-            full_screen=True,
-        ),
 
-        # Row 3: Four chart placeholders in a 2x2 grid
+        # Row 2: Four chart placeholders in a 2x2 grid
         # TODO: Replace each ui.p with the matching output_widget(...)
         # and implement the corresponding render function in the server
         ui.layout_columns(
@@ -127,6 +124,18 @@ app_ui = ui.page_fluid(
 
             col_widths=[3, 3, 3, 3],
         ),
+
+        # Row 3: map and more
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("foobar"),
+            ),
+            ui.card(
+                ui.card_header("Avg Addiction Score by Country"),
+                output_widget("map_chart"),
+                full_screen=True,
+            ),
+        ),
     ),
 )
 
@@ -145,31 +154,81 @@ def server(input, output, session):
     # ── Stat tiles ────────────────────────────────────────────────────
     # TODO: Uncomment and wire up once value_box uses output_text(...)
 
-    # @render.text
-    # def tile_students():
-    #     return str(len(filtered()))
+    @render.text
+    def tile_students():
+        return str(len(filtered()))
 
-    # @render.text
-    # def tile_usage():
-    #     d = filtered()
-    #     return f"{d['Avg_Daily_Usage_Hours'].mean():.1f}h" if len(d) else "—"
+    @render.text
+    def tile_usage():
+        d = filtered()
+        return f"{d['Avg_Daily_Usage_Hours'].mean():.1f}h" if len(d) else "—"
 
-    # @render.text
-    # def tile_sleep():
-    #     d = filtered()
-    #     return f"{d['Sleep_Hours_Per_Night'].mean():.1f}h" if len(d) else "—"
+    @render.text
+    def tile_sleep():
+        d = filtered()
+        return f"{d['Sleep_Hours_Per_Night'].mean():.1f}h" if len(d) else "—"
 
-    # @render.text
-    # def tile_score():
-    #     d = filtered()
-    #     return f"{d['Addicted_Score'].mean():.1f}" if len(d) else "—"
+    @render.text
+    def tile_addiction():
+        d = filtered()
+        return f"{d['Addicted_Score'].mean():.1f}" if len(d) else "—"
 
     # ── Map ───────────────────────────────────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("map_chart")
 
-    # @render_plotly
-    # def map_chart():
-    #     ...
+    @render_plotly
+    def map_chart():
+        d = filtered()
+        d = d[d['Country'].isin(['China', 'India', 'USA', 'Russia', 'Mexico'])]
+        
+        selected_country = d['Country'].unique()
+        df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
+        df_unselected = df_all_country[~df_all_country['Country'].isin(selected_country)]
+
+        fig_unselected = px.choropleth(
+            df_unselected,
+            locations='Country',
+            locationmode='country names',
+            color='Addicted_Score',
+            color_continuous_scale='Reds',
+            range_color=[MIN_SCORE, MAX_SCORE]
+        )
+        fig_unselected.update_traces(
+            marker = dict(opacity=0.2),
+            hoverinfo = 'skip',
+            hovertemplate = None,
+        )
+        
+        fig = px.choropleth(
+            df_selected,
+            locations='Country',
+            locationmode='country names',
+            color='Addicted_Score',
+            color_continuous_scale='Reds',
+            range_color=[MIN_SCORE, MAX_SCORE],
+            hover_name='Country',
+            labels={
+                'Student_ID': 'Total Students',
+                'Avg_Daily_Usage_Hours': 'Avg Daily Usage (hrs)',
+                'Sleep_Hours_Per_Night': 'Sleep per Night (hrs)',
+                'Addicted_Score': 'Addicted Score'
+            },
+            hover_data={
+                'Country': False,
+                'Student_ID': True,
+                'Avg_Daily_Usage_Hours': ":.1f",
+                'Sleep_Hours_Per_Night': ":.1f",
+                'Addicted_Score': ":.1f"
+            },
+        )
+
+        fig.add_trace(fig_unselected.data[0])
+
+        fig.update_layout(
+            geo=dict(showframe=False)
+        )
+        
+        return fig
 
     # ── Chart 1: Affects Academic Performance ─────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_affects")
