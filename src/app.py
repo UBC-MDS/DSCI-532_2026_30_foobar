@@ -10,8 +10,9 @@ Open:     http://127.0.0.1:8000
 import pandas as pd
 import plotly.graph_objects as go
 from shiny import App, render, ui, reactive
-from shinywidgets import render_plotly, output_widget
+from shinywidgets import render_plotly, output_widget, render_altair
 from pathlib import Path
+import altair as alt
 
 
 # ── DATA ─────────────────────────────────────────────────────────────
@@ -140,6 +141,17 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered():
+
+        df = df[df["Academic_Level"].isin(["Undergraduate", "Graduate"])]
+
+        if input.academiclvl() != "All":
+            df = df[df["Academic_Level"] == input.academic_level()] 
+        
+        if input.gender() != "All":
+            df = df[df["Gender"] == input.academic_level()] 
+        
+        df = df[df["Age"].between(input.input_age()[0], input.input_age()[1])]
+
         return df.copy()
 
     # ── Stat tiles ────────────────────────────────────────────────────
@@ -171,12 +183,27 @@ def server(input, output, session):
     # def map_chart():
     #     ...
 
-    # ── Chart 1: Affects Academic Performance ─────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_affects")
+    # ── Chart 1: Does social media affect academic performance? ─────────────────────────
+    @render_altair
+    def plot_AAP():
 
-    # @render_plotly
-    # def chart_affects():
-    #     ...
+        #calculate the percentage
+        percent = (df.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
+        percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
+
+        chart = alt.Chart(percent).mark_bar().encode(
+            alt.Y("Affects_Academic_Performance:N"),
+            alt.X("Percentage:Q", title = "Percentage of Students"),
+            tooltip = [alt.Tooltip("Affects_Academic_Performance:N", title = "Affects Academic Performance?"),
+            alt.Tooltip("Count:Q", title = "Number of Students"),
+            alt.Tooltip("Percentage:Q", title = "Percentage of Students being Affected")]
+        )
+
+        chart + chart.mark_text(align = "left").encode(text = alt.Text("Percentage:Q",format='.0%'), 
+        color=alt.value('black'))
+
+        return chart
+
 
     # ── Chart 2: Academic Level ───────────────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_level")
@@ -185,12 +212,29 @@ def server(input, output, session):
     # def chart_level():
     #     ...
 
-    # ── Chart 3: Sleep Distribution ───────────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_sleep")
+    # ── Chart 3: Academic Level Distribution ───────────────────────────────────
+    @render_altair
+    def plot_academiclvldist():
+        
+        chart = alt.Chart().mark_bar().encode(
+            alt.X("Academic_Level:N",
+                title = "Academic Level Distribution",
+                sort = ["Undergraduate", "Graduate"]),
 
-    # @render_plotly
-    # def chart_sleep():
-    #     ...
+            alt.Y("Count:Q",
+                title = "Number of Students"),
+
+            alt.Color("Gender:N",
+                scale = alt.Scale(
+                    domain = ["Male", "Female"]),
+                    legend=alt.Legend(title="Gender")
+                    ),
+            tooltip = [alt.Tooltip("Academic_Level:N", title="Academic Level"),
+            alt.Tooltip("Gender:N", title="Gender"),
+            alt.Tooltip("Count:Q", title="Number of Students")
+            ])
+
+        return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_platform")
