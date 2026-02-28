@@ -59,15 +59,47 @@ app_ui = ui.page_fluid(
 
             ui.h6("Filters"),
 
-            # TODO: Add filter controls here
-            # Examples:
-            #   ui.input_radio_buttons(...)   → Gender
-            #   ui.input_slider(...)          → Age range
-            #   ui.input_select(...)          → Academic level
-            #   ui.input_selectize(...)       → Country, Platform
-            #   ui.input_action_button(...)   → Reset button
+            # Filter 1: Gender (radio buttons)
+            ui.input_radio_buttons(
+                id="f_gender",
+                label="Gender",
+                choices={"All": "All", "Male": "Male", "Female": "Female"},
+                selected="All",
+                inline=True,
+            ),
 
-            ui.p("[ Filters go here ]", style="color: gray; font-style: italic;"),
+            # Filter 2: Age range (slider with two handles)
+            ui.input_slider(
+                id="f_age",
+                label="Age range",
+                min=AGE_MIN,
+                max=AGE_MAX,
+                value=[AGE_MIN, AGE_MAX],
+            ),
+
+            # Filter 3: Academic level (single dropdown)
+            ui.input_select(
+                id="f_level",
+                label="Academic level",
+                choices={"All": "All", "Undergraduate": "Undergraduate", "Graduate": "Graduate"},
+                selected="All",
+            ),
+
+            # Filter 4: Country (multi-select)
+            ui.input_selectize(
+                id="f_country",
+                label="Country",
+                choices=sorted(df["Country"].unique().tolist()),
+                multiple=True,
+            ),
+
+            # Filter 5: Platform (multi-select)
+            ui.input_selectize(
+                id="f_platform",
+                label="Platform",
+                choices=sorted(df["Most_Used_Platform"].unique().tolist()),
+                multiple=True,
+            ),
 
             open="desktop",
         ),
