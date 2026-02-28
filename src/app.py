@@ -14,6 +14,7 @@ import altair as alt
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, render_altair, output_widget
 from pathlib import Path
+import altair as alt
 
 
 # ── DATA ─────────────────────────────────────────────────────────────
@@ -90,10 +91,7 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Affects Academic Performance"),
-                ui.p(
-                    "[ Horizontal bar: % Yes vs No ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("plot_AAP"),
                 full_screen=True,
             ),
 
@@ -107,11 +105,8 @@ app_ui = ui.page_fluid(
             ),
 
             ui.card(
-                ui.card_header("Sleep Distribution"),
-                ui.p(
-                    "[ Bar chart: students per sleep bucket (<5h, 5-6h, ...) ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                ui.card_header("Academic Level Distribution"),
+                output_widget("plot_academiclvldist"),
                 full_screen=True,
             ),
 
@@ -152,8 +147,19 @@ def server(input, output, session):
     # For now, filtered() just returns the full dataset.
 
     @reactive.calc
-    def filtered():
-        return df.copy()
+    def filtered_df():
+        data = df.copy()
+        data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
+
+        if input.academiclvl() != "All":
+            data = data[data["Academic_Level"] == input.academiclvl()] 
+        
+        if input.gender() != "All":
+            data = data[data["Gender"] == input.gender()] 
+        
+        data = data[data["Age"].between(input.age()[0], input.age()[1])]
+
+        return data
 
     # ── Stat tiles ────────────────────────────────────────────────────
     # TODO: Uncomment and wire up once value_box uses output_text(...)
@@ -276,12 +282,25 @@ def server(input, output, session):
         
         return fig
 
-    # ── Chart 1: Affects Academic Performance ─────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_affects")
+    # ── Chart 1: Does social media affect academic performance? ─────────────────────────
+    @render_altair
+    def plot_AAP():
+        df1 = filtered_df()
+        #calculate the percentage
+        percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
+        percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
+        percent["label"] = percent["Percentage"].astype(str) + "%"
 
-    # @render_plotly
-    # def chart_affects():
-    #     ...
+
+        chart = alt.Chart(percent).mark_bar().encode(
+            alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
+            alt.X("Percentage:Q", title = "Percentage of Students"),
+            tooltip = [alt.Tooltip("Affects_Academic_Performance:N", title = "Affects Academic Performance?"),
+            alt.Tooltip("Count:Q", title = "Number of Students"),
+            alt.Tooltip("Percentage:Q", title = "Percentage of Students being Affected")]
+        )
+
+        return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
 
     # ── Chart 2: Academic Level ───────────────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_level")
@@ -290,12 +309,33 @@ def server(input, output, session):
     # def chart_level():
     #     ...
 
-    # ── Chart 3: Sleep Distribution ───────────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_sleep")
+    # ── Chart 3: Academic Level Distribution ───────────────────────────────────
+    @render_altair
+    def plot_academiclvldist():
+        df = filtered_df()
 
-    # @render_plotly
-    # def chart_sleep():
-    #     ...
+        group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
+
+        chart = alt.Chart(group_gender_df).mark_bar().encode(
+            alt.X("Academic_Level:N",
+                title = "Academic Level",
+                sort = ["Undergraduate", "Graduate"]),
+
+            alt.Y("Count:Q",
+                title = "Number of Students"),
+
+            alt.Color("Gender:N",
+                scale = alt.Scale(
+                    domain = ["Male", "Female"]),
+                    legend=alt.Legend(title="Gender")
+                    ),
+            order = alt.Order("Gender:N", sort="ascending"),
+            tooltip = [alt.Tooltip("Academic_Level:N", title="Academic Level"),
+            alt.Tooltip("Gender:N", title="Gender"),
+            alt.Tooltip("Count:Q", title="Number of Students")
+            ])
+
+        return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_platform")
