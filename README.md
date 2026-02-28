@@ -6,6 +6,10 @@ This project presents an interactive data visualization dashboard designed to ex
 
 The dashboard is intended for school administrators, counselors, and students seeking to better understand digital behavior and its impact on well-being and academic outcomes. Through interactive filtering and comparative visualizations, users can potentially identify high-risk groups and conduct targeted interventions or self regulation making based on this.
 
+### Demo
+
+![Dashboard Demo](img/demo.gif)
+
 ### Setup
 First, clone the repository and navigate into the project directory:
 
@@ -33,11 +37,17 @@ shiny run app.py
 ```
 You will be able to access the app at the link displayed in the command line.
 
+### Live App
+
 #### Stable (main): 
 https://019ca108-2c5a-f4a9-1093-cdd4a540d77d.share.connect.posit.cloud/
 
 #### Preview (dev): 
 https://019ca127-fdc0-0c6d-1031-e1462c7abb05.share.connect.posit.cloud/
+
+### Contributing
+
+Interested in contributing? Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on filing issues, branch naming, code style (PEP8), and the pull request review process.
 
 ## Team Members
 
