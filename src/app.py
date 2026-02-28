@@ -33,14 +33,14 @@ df = pd.read_csv(DATA_PATH)
 AGE_MIN = int(df["Age"].min())
 AGE_MAX = int(df["Age"].max())
 
-df_all_country = df.groupby("Country", as_index=False).agg({
-    "Student_ID": "count",
-    "Avg_Daily_Usage_Hours": "mean",
-    "Sleep_Hours_Per_Night": "mean",
-    "Addicted_Score": "mean",
-})
-MIN_SCORE = df_all_country["Addicted_Score"].min()
-MAX_SCORE = df_all_country["Addicted_Score"].max()
+#df_all_country = df.groupby("Country", as_index=False).agg({
+#    "Student_ID": "count",
+#    "Avg_Daily_Usage_Hours": "mean",
+#    "Sleep_Hours_Per_Night": "mean",
+#    "Addicted_Score": "mean",
+#})
+MIN_SCORE = df["Addicted_Score"].min()
+MAX_SCORE = df["Addicted_Score"].max()
 
 
 # ── UI ───────────────────────────────────────────────────────────────
@@ -178,26 +178,33 @@ def server(input, output, session):
 
     @render_plotly
     def map_chart():
-        d = filtered()
+        d = filtered().copy()
         d = d[d['Country'].isin(['China', 'India', 'USA', 'Russia', 'Mexico'])]
         
-        selected_country = d['Country'].unique()
-        df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
-        df_unselected = df_all_country[~df_all_country['Country'].isin(selected_country)]
+        #selected_country = d['Country'].unique()
+        #df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
+        #df_unselected = df_all_country[~df_all_country['Country'].isin(selected_country)]
 
-        fig_unselected = px.choropleth(
-            df_unselected,
-            locations='Country',
-            locationmode='country names',
-            color='Addicted_Score',
-            color_continuous_scale='Reds',
-            range_color=[MIN_SCORE, MAX_SCORE]
-        )
-        fig_unselected.update_traces(
-            marker = dict(opacity=0.2),
-            hoverinfo = 'skip',
-            hovertemplate = None,
-        )
+        #fig_unselected = px.choropleth(
+        #    df_unselected,
+        #    locations='Country',
+        #    locationmode='country names',
+        #    color='Addicted_Score',
+        #    color_continuous_scale='Reds',
+        #    range_color=[MIN_SCORE, MAX_SCORE]
+        #)
+        #fig_unselected.update_traces(
+        #    marker = dict(opacity=0.2),
+        #    hoverinfo = 'skip',
+        #    hovertemplate = None,
+        #)
+
+        df_selected = d.groupby("Country", as_index=False).agg({
+            "Student_ID": "count",
+            "Avg_Daily_Usage_Hours": "mean",
+            "Sleep_Hours_Per_Night": "mean",
+            "Addicted_Score": "mean",
+        })
         
         fig = px.choropleth(
             df_selected,
@@ -222,7 +229,7 @@ def server(input, output, session):
             },
         )
 
-        fig.add_trace(fig_unselected.data[0])
+        #fig.add_trace(fig_unselected.data[0])
 
         fig.update_layout(
             geo=dict(showframe=False)
