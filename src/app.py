@@ -49,29 +49,35 @@ MAX_SCORE = df["Addicted_Score"].max()
 # ── UI ───────────────────────────────────────────────────────────────
 
 custom_css = """
+
+h2, .panel-title {
+    color: #0F1F3D !important;
+}
+
 body {
     background-color: #F4F6F9 !important;
 }
 
-.bslib-page-sidebar {
-    background-color: #A8B8CC !important;
-    color: #0F1F3D !important;
-}
-
-.bslib-sidebar {
-    background-color: #2c3e50 !important;
-    color: #ecf0f1 !important;
-}
-
-.bslib-sidebar p, 
-.bslib-sidebar div {
-    color: #ecf0f1 !important;
-}
-
 .card-header {
-    background-color: #A8B8CC !important;
+    background-color: #c8d2df !important;
     color: #0F1F3D !important;
     font-weight: bold;
+}
+
+.card {
+    border: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.bslib-value-box {
+    border: none !important;
+    border-left: 5px solid #c8d2df !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    color: #0F1F3D !important;
+}
+
+.shiny-text-output {
+    color: #0F1F3D !important;
 }
 """
 
@@ -134,6 +140,8 @@ app_ui = ui.page_fluid(
 
 
             open="desktop",
+            bg = "#EEF1F6",
+            fg = "#0F1F3D",
         ),
 
         # ── MAIN AREA ─────────────────────────────────────────────────
