@@ -9,6 +9,7 @@ Open:     http://127.0.0.1:8000
 
 import pandas as pd
 import plotly.express as px
+import pycountry
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, output_widget
 from pathlib import Path
@@ -179,7 +180,7 @@ def server(input, output, session):
     @render_plotly
     def map_chart():
         d = filtered().copy()
-        d = d[d['Country'].isin(['China', 'India', 'USA', 'Russia', 'Mexico'])]
+        d = d[d['Country'].isin(['Canada', 'Mexico'])]
         
         #selected_country = d['Country'].unique()
         #df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
@@ -205,11 +206,19 @@ def server(input, output, session):
             "Sleep_Hours_Per_Night": "mean",
             "Addicted_Score": "mean",
         })
+
+        def get_iso3(country_name):
+            try:
+                return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
+            except:
+                return None # Handle unrecognized countries
+
+        df_selected['iso_alpha'] = df_selected['Country'].apply(get_iso3)
         
         fig = px.choropleth(
             df_selected,
-            locations='Country',
-            locationmode='country names',
+            locations='iso_alpha',
+            locationmode='ISO-3',
             color='Addicted_Score',
             color_continuous_scale='Reds',
             range_color=[MIN_SCORE, MAX_SCORE],
@@ -222,6 +231,7 @@ def server(input, output, session):
             },
             hover_data={
                 'Country': False,
+                'iso_alpha': False,
                 'Student_ID': True,
                 'Avg_Daily_Usage_Hours': ":.1f",
                 'Sleep_Hours_Per_Night': ":.1f",
@@ -230,10 +240,8 @@ def server(input, output, session):
         )
 
         #fig.add_trace(fig_unselected.data[0])
-
-        fig.update_layout(
-            geo=dict(showframe=False)
-        )
+        fig.update_geos(fitbounds="locations", showframe=False)
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         
         return fig
 

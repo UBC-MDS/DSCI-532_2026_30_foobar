@@ -13,6 +13,7 @@ dependencies:
   - plotly>=5.24.1
   - jupyterlab>=4.0
   - anywidget>=0.9.13
+  - pycountry>=22.3.5
   - pip
   - pip:
     - kagglehub
