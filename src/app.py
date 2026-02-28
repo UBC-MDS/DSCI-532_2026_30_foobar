@@ -10,8 +10,9 @@ Open:     http://127.0.0.1:8000
 import pandas as pd
 import plotly.express as px
 import pycountry
+import altair as alt
 from shiny import App, render, ui, reactive
-from shinywidgets import render_plotly, output_widget
+from shinywidgets import render_plotly, render_altair, output_widget
 from pathlib import Path
 
 
@@ -129,7 +130,9 @@ app_ui = ui.page_fluid(
         # Row 3: map and more
         ui.layout_columns(
             ui.card(
-                ui.card_header("foobar"),
+                ui.card_header("Addiction vs Mental Health & Sleep"),
+                output_widget("scatter_chart"),
+                full_screen=True,
             ),
             ui.card(
                 ui.card_header("Avg Addiction Score by Country"),
@@ -174,13 +177,39 @@ def server(input, output, session):
         d = filtered()
         return f"{d['Addicted_Score'].mean():.1f}" if len(d) else "—"
 
+    @render_altair
+    def scatter_chart():
+        d = filtered()
+        fig = alt.Chart(d).transform_calculate(
+            jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
+            jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
+        ).mark_circle(size=50, opacity=0.7).encode(
+            x=alt.X(
+                "jitter_addiction:Q", 
+                title="Addiction Score", 
+                scale=alt.Scale(zero=False)
+            ),
+            y=alt.Y(
+                "jitter_mental:Q", 
+                title="Mental Health Score", 
+                scale=alt.Scale(zero=False)
+            ),
+            color=alt.Color(
+                "Sleep_Hours_Per_Night", 
+                title="Sleep Time (hrs)", 
+                scale=alt.Scale(scheme="viridis")
+            ),
+            tooltip=["Addicted_Score", "Mental_Health_Score", "Sleep_Hours_Per_Night"]
+        ).interactive()
+        
+        return fig
+
     # ── Map ───────────────────────────────────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("map_chart")
 
     @render_plotly
     def map_chart():
         d = filtered().copy()
-        d = d[d['Country'].isin(['Canada', 'Mexico'])]
+        #d = d[d['Country'].isin(['Canada', 'Mexico'])]
         
         #selected_country = d['Country'].unique()
         #df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
@@ -214,13 +243,13 @@ def server(input, output, session):
                 return None # Handle unrecognized countries
 
         df_selected['iso_alpha'] = df_selected['Country'].apply(get_iso3)
-        
+        df_selected = df_selected.dropna(subset=['iso_alpha'])
         fig = px.choropleth(
             df_selected,
             locations='iso_alpha',
             locationmode='ISO-3',
             color='Addicted_Score',
-            color_continuous_scale='Reds',
+            color_continuous_scale='viridis',
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name='Country',
             labels={
@@ -238,6 +267,8 @@ def server(input, output, session):
                 'Addicted_Score': ":.1f"
             },
         )
+        fig.update_coloraxes(reversescale=True)
+
 
         #fig.add_trace(fig_unselected.data[0])
         fig.update_geos(fitbounds="locations", showframe=False)
