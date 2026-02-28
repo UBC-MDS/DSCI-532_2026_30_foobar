@@ -48,7 +48,44 @@ MAX_SCORE = df["Addicted_Score"].max()
 
 # ── UI ───────────────────────────────────────────────────────────────
 
+custom_css = """
+
+h2, .panel-title {
+    color: #0F1F3D !important;
+}
+
+body {
+    background-color: #F4F6F9 !important;
+}
+
+.card-header {
+    background-color: #c8d2df !important;
+    color: #0F1F3D !important;
+    font-weight: bold;
+}
+
+.card {
+    border: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.bslib-value-box {
+    border: none !important;
+    border-left: 5px solid #c8d2df !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    color: #0F1F3D !important;
+}
+
+.shiny-text-output {
+    color: #0F1F3D !important;
+}
+"""
+
 app_ui = ui.page_fluid(
+
+    ui.head_content(
+        ui.tags.style(custom_css)
+    ),
 
     ui.panel_title("Social Media Addiction Dashboard"),
 
@@ -59,17 +96,52 @@ app_ui = ui.page_fluid(
 
             ui.h6("Filters"),
 
-            # TODO: Add filter controls here
-            # Examples:
-            #   ui.input_radio_buttons(...)   → Gender
-            #   ui.input_slider(...)          → Age range
-            #   ui.input_select(...)          → Academic level
-            #   ui.input_selectize(...)       → Country, Platform
-            #   ui.input_action_button(...)   → Reset button
+            # Filter 1: Gender (radio buttons)
+            ui.input_radio_buttons(
+                id="f_gender",
+                label="Gender",
+                choices={"All": "All", "Male": "Male", "Female": "Female"},
+                selected="All",
+                inline=True,
+            ),
 
-            ui.p("[ Filters go here ]", style="color: gray; font-style: italic;"),
+            # Filter 2: Age range (slider with two handles)
+            ui.input_slider(
+                id="f_age",
+                label="Age range",
+                min=AGE_MIN,
+                max=AGE_MAX,
+                value=[AGE_MIN, AGE_MAX],
+            ),
+
+            # Filter 3: Academic level (single dropdown)
+            ui.input_select(
+                id="f_level",
+                label="Academic level",
+                choices={"All": "All", "Undergraduate": "Undergraduate", "Graduate": "Graduate"},
+                selected="All",
+            ),
+
+            # Filter 4: Country (multi-select)
+            ui.input_selectize(
+                id="f_country",
+                label="Country",
+                choices=sorted(df["Country"].unique().tolist()),
+                multiple=True,
+            ),
+
+            # Filter 5: Platform (multi-select)
+            ui.input_selectize(
+                id="f_platform",
+                label="Platform",
+                choices=sorted(df["Most_Used_Platform"].unique().tolist()),
+                multiple=True,
+            ),
+
 
             open="desktop",
+            bg = "#EEF1F6",
+            fg = "#0F1F3D",
         ),
 
         # ── MAIN AREA ─────────────────────────────────────────────────
@@ -97,12 +169,9 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Academic Level"),
-                ui.p(
-                    "[ Donut chart: Undergraduate vs Graduate ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("donut_academic_level"),
                 full_screen=True,
-            ),
+                ),
 
             ui.card(
                 ui.card_header("Academic Level Distribution"),
@@ -112,12 +181,9 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Platform Distribution"),
-                ui.p(
-                    "[ Donut chart: share by most-used platform ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("donut_platform"),
                 full_screen=True,
-            ),
+                ),
 
             col_widths=[3, 3, 3, 3],
         ),
@@ -142,6 +208,12 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
 
+    custom_ui_scale = alt.Scale(
+        range=['#0F1F3D', '#2D6BE4', '#26f7fd'],
+        type='linear'
+    )
+    
+
     # ── Filtered data ─────────────────────────────────────────────────
     # TODO: Add filter logic here once sidebar inputs are wired up.
     # For now, filtered_df() just returns the full dataset.
@@ -151,14 +223,20 @@ def server(input, output, session):
         data = df.copy()
         data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
-        # Uncomment these lines once the UI inputs are added to the sidebar:
-        # if input.academiclvl() != "All":
-        #     data = data[data["Academic_Level"] == input.academiclvl()] 
-        # 
-        # if input.gender() != "All":
-        #     data = data[data["Gender"] == input.gender()] 
-        # 
-        # data = data[data["Age"].between(input.age()[0], input.age()[1])]
+        if input.f_gender() != "All":
+            data = data[data["Gender"] == input.f_gender()]
+
+        age_low, age_high = input.f_age()
+        data = data[(data["Age"] >= age_low) & (data["Age"] <= age_high)]
+
+        if input.f_level() != "All":
+            data = data[data["Academic_Level"] == input.f_level()]
+
+        if input.f_country():  # empty tuple means "all countries"
+            data = data[data["Country"].isin(input.f_country())]
+
+        if input.f_platform():
+            data = data[data["Most_Used_Platform"].isin(input.f_platform())]
 
         return data
 
@@ -204,7 +282,7 @@ def server(input, output, session):
             color=alt.Color(
                 "Sleep_Hours_Per_Night", 
                 title="Sleep Time (hrs)", 
-                scale=alt.Scale(scheme="viridis")
+                scale=custom_ui_scale#alt.Scale(scheme="viridis")
             ),
             tooltip=["Addicted_Score", "Mental_Health_Score", "Sleep_Hours_Per_Night"]
         ).interactive()
@@ -256,7 +334,11 @@ def server(input, output, session):
             locations='iso_alpha',
             locationmode='ISO-3',
             color='Addicted_Score',
-            color_continuous_scale='viridis',
+            color_continuous_scale=[
+                [0.0, '#0F1F3D'],
+                [0.3, '#517BD6'],
+                [1.0, '#26f7fd']
+            ],#'viridis',
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name='Country',
             labels={
@@ -296,19 +378,15 @@ def server(input, output, session):
         chart = alt.Chart(percent).mark_bar().encode(
             alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
             alt.X("Percentage:Q", title = "Percentage of Students"),
+            alt.Color("Affects_Academic_Performance:N", scale=alt.Scale(domain=["Yes", "No"],
+            range=["#c0392b", "#1e3a6e"]), legend = None),
+
             tooltip = [alt.Tooltip("Affects_Academic_Performance:N", title = "Affects Academic Performance?"),
             alt.Tooltip("Count:Q", title = "Number of Students"),
             alt.Tooltip("Percentage:Q", title = "Percentage of Students being Affected")]
         )
 
         return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
-
-    # ── Chart 2: Academic Level ───────────────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_level")
-
-    # @render_plotly
-    # def chart_level():
-    #     ...
 
     # ── Chart 3: Academic Level Distribution ───────────────────────────────────
     @render_altair
@@ -320,16 +398,18 @@ def server(input, output, session):
         chart = alt.Chart(group_gender_df).mark_bar().encode(
             alt.X("Academic_Level:N",
                 title = "Academic Level",
-                sort = ["Undergraduate", "Graduate"]),
+                sort = ["Undergraduate", "Graduate"],
+                axis=alt.Axis(labelAngle=0)),
 
             alt.Y("Count:Q",
                 title = "Number of Students"),
 
             alt.Color("Gender:N",
                 scale = alt.Scale(
-                    domain = ["Male", "Female"]),
-                    legend=alt.Legend(title="Gender")
+                    domain = ["Male", "Female"], range=["#1e3a6e", "#5ba4cf"]),
+                    legend=alt.Legend(title="Gender"),
                     ),
+
             order = alt.Order("Gender:N", sort="ascending"),
             tooltip = [alt.Tooltip("Academic_Level:N", title="Academic Level"),
             alt.Tooltip("Gender:N", title="Gender"),
@@ -339,13 +419,85 @@ def server(input, output, session):
         return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_platform")
 
-    # @render_plotly
-    # def chart_platform():
-    #     ...
+    @render_altair
+    def donut_platform():
+        d = filtered_df()
+        
+        platform_counts = (
+            d.groupby("Most_Used_Platform")
+            .size()
+            .reset_index(name="Count")
+        )
+        
+        total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
+        
+        if total > 0:
+            platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).round(1).astype(str) + "%"
+        else:
+            platform_counts["Percentage"] = []
+            
+        donut = alt.Chart(platform_counts).encode(
+            theta=alt.Theta("Count:Q", stack=True),
+            color=alt.Color("Most_Used_Platform:N", title="Platform",
+            scale=alt.Scale(
+                domain=["Facebook", "Instagram", "KakaoTalk", "LINE", "LinkedIn",
+                        "Snapchat", "TikTok", "Twitter", "VKontakte",
+                        "WeChat", "WhatsApp", "YouTube"],
+                range=["#1e3a6e", "#2d6be4", "#5ba4cf", "#4f6bed", "#7b8fab",
+                       "#a8b8cc", "#0f1f3d", "#3a5a9e", "#6d8fc0", "#b8c8e0", "#d0dff0", "#bfd4e8"],
+            )),
+            tooltip=[
+                alt.Tooltip("Most_Used_Platform:N", title="Platform"),
+                alt.Tooltip("Count:Q", title="Students"),
+                alt.Tooltip("Percentage:N", title="Percentage"),
+            ],
+        ).mark_arc(innerRadius=30)
+        
+        return donut
+    
+    # ── Chart 2: Academic Level ───────────────────────────────
+    @render_altair
+    def donut_academic_level():
+        d = filtered_df()
+        
+        level_counts = (
+        d.groupby("Academic_Level")
+        .size()
+        .reset_index(name="Count")
+        )
+        
+        
+        
+        total = int(level_counts["Count"].sum()) if len(level_counts) else 0
 
-    pass 
+        if total > 0:
+            level_counts["Percentage"] = (level_counts["Count"] / total * 100).round(1).astype(str) + "%"
+        else:
+            level_counts["Percentage"] = []
+
+        donut = (
+            alt.Chart(level_counts)
+            .encode(
+                theta=alt.Theta("Count:Q"),
+                color=alt.Color("Academic_Level:N", title="Academic Level",
+                scale=alt.Scale(
+                domain=["Undergraduate", "Graduate"],
+                range=["#1e3a6e", "#5ba4cf"],
+            )),
+                tooltip=[
+                    alt.Tooltip("Academic_Level:N", title="Academic Level"),
+                    alt.Tooltip("Count:Q", title="Students"),
+                    alt.Tooltip("Percentage:N", title="Percentage"),
+                ],
+            )
+        ).mark_arc(innerRadius=30)
+        
+        return donut
+        
+        
+    
+        
 
 # ── APP ───────────────────────────────────────────────────────────────
 
