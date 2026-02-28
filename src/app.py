@@ -441,11 +441,11 @@ def server(input, output, session):
             theta=alt.Theta("Count:Q", stack=True),
             color=alt.Color("Most_Used_Platform:N", title="Platform",
             scale=alt.Scale(
-                domain=["Facebook", "Instagram", "KakaoTalk", "LinkedIn",
+                domain=["Facebook", "Instagram", "KakaoTalk", "LINE", "LinkedIn",
                         "Snapchat", "TikTok", "Twitter", "VKontakte",
                         "WeChat", "WhatsApp", "YouTube"],
                 range=["#1e3a6e", "#2d6be4", "#5ba4cf", "#4f6bed", "#7b8fab",
-                       "#a8b8cc", "#0f1f3d", "#3a5a9e", "#6d8fc0", "#b8c8e0", "#d0dff0"],
+                       "#a8b8cc", "#0f1f3d", "#3a5a9e", "#6d8fc0", "#b8c8e0", "#d0dff0", "#bfd4e8"],
             )),
             tooltip=[
                 alt.Tooltip("Most_Used_Platform:N", title="Platform"),
