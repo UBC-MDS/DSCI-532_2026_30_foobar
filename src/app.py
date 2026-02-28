@@ -144,20 +144,21 @@ def server(input, output, session):
 
     # ── Filtered data ─────────────────────────────────────────────────
     # TODO: Add filter logic here once sidebar inputs are wired up.
-    # For now, filtered() just returns the full dataset.
+    # For now, filtered_df() just returns the full dataset.
 
     @reactive.calc
     def filtered_df():
         data = df.copy()
         data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
-        if input.academiclvl() != "All":
-            data = data[data["Academic_Level"] == input.academiclvl()] 
-        
-        if input.gender() != "All":
-            data = data[data["Gender"] == input.gender()] 
-        
-        data = data[data["Age"].between(input.age()[0], input.age()[1])]
+        # Uncomment these lines once the UI inputs are added to the sidebar:
+        # if input.academiclvl() != "All":
+        #     data = data[data["Academic_Level"] == input.academiclvl()] 
+        # 
+        # if input.gender() != "All":
+        #     data = data[data["Gender"] == input.gender()] 
+        # 
+        # data = data[data["Age"].between(input.age()[0], input.age()[1])]
 
         return data
 
@@ -166,26 +167,26 @@ def server(input, output, session):
 
     @render.text
     def tile_students():
-        return str(len(filtered()))
+        return str(len(filtered_df()))
 
     @render.text
     def tile_usage():
-        d = filtered()
+        d = filtered_df()
         return f"{d['Avg_Daily_Usage_Hours'].mean():.1f}h" if len(d) else "—"
 
     @render.text
     def tile_sleep():
-        d = filtered()
+        d = filtered_df()
         return f"{d['Sleep_Hours_Per_Night'].mean():.1f}h" if len(d) else "—"
 
     @render.text
     def tile_addiction():
-        d = filtered()
+        d = filtered_df()
         return f"{d['Addicted_Score'].mean():.1f}" if len(d) else "—"
 
     @render_altair
     def scatter_chart():
-        d = filtered()
+        d = filtered_df()
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
@@ -214,7 +215,7 @@ def server(input, output, session):
 
     @render_plotly
     def map_chart():
-        d = filtered().copy()
+        d = filtered_df().copy()
         #d = d[d['Country'].isin(['Canada', 'Mexico'])]
         
         #selected_country = d['Country'].unique()
