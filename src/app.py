@@ -378,19 +378,15 @@ def server(input, output, session):
         chart = alt.Chart(percent).mark_bar().encode(
             alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
             alt.X("Percentage:Q", title = "Percentage of Students"),
+            alt.Color("Affects_Academic_Performance:N", scale=alt.Scale(domain=["Yes", "No"],
+            range=["#c0392b", "#1e3a6e"]), legend = None),
+
             tooltip = [alt.Tooltip("Affects_Academic_Performance:N", title = "Affects Academic Performance?"),
             alt.Tooltip("Count:Q", title = "Number of Students"),
             alt.Tooltip("Percentage:Q", title = "Percentage of Students being Affected")]
         )
 
         return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
-
-    # ── Chart 2: Academic Level ───────────────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_level")
-
-    # @render_plotly
-    # def chart_level():
-    #     ...
 
     # ── Chart 3: Academic Level Distribution ───────────────────────────────────
     @render_altair
@@ -402,16 +398,18 @@ def server(input, output, session):
         chart = alt.Chart(group_gender_df).mark_bar().encode(
             alt.X("Academic_Level:N",
                 title = "Academic Level",
-                sort = ["Undergraduate", "Graduate"]),
+                sort = ["Undergraduate", "Graduate"],
+                axis=alt.Axis(labelAngle=0)),
 
             alt.Y("Count:Q",
                 title = "Number of Students"),
 
             alt.Color("Gender:N",
                 scale = alt.Scale(
-                    domain = ["Male", "Female"]),
-                    legend=alt.Legend(title="Gender")
+                    domain = ["Male", "Female"], range=["#1e3a6e", "#5ba4cf"]),
+                    legend=alt.Legend(title="Gender"),
                     ),
+
             order = alt.Order("Gender:N", sort="ascending"),
             tooltip = [alt.Tooltip("Academic_Level:N", title="Academic Level"),
             alt.Tooltip("Gender:N", title="Gender"),
@@ -441,7 +439,14 @@ def server(input, output, session):
             
         donut = alt.Chart(platform_counts).encode(
             theta=alt.Theta("Count:Q", stack=True),
-            color=alt.Color("Most_Used_Platform:N", title="Platform"),
+            color=alt.Color("Most_Used_Platform:N", title="Platform",
+            scale=alt.Scale(
+                domain=["Facebook", "Instagram", "KakaoTalk", "LinkedIn",
+                        "Snapchat", "TikTok", "Twitter", "VKontakte",
+                        "WeChat", "WhatsApp", "YouTube"],
+                range=["#1e3a6e", "#2d6be4", "#5ba4cf", "#4f6bed", "#7b8fab",
+                       "#a8b8cc", "#0f1f3d", "#3a5a9e", "#6d8fc0", "#b8c8e0", "#d0dff0"],
+            )),
             tooltip=[
                 alt.Tooltip("Most_Used_Platform:N", title="Platform"),
                 alt.Tooltip("Count:Q", title="Students"),
@@ -475,7 +480,11 @@ def server(input, output, session):
             alt.Chart(level_counts)
             .encode(
                 theta=alt.Theta("Count:Q"),
-                color=alt.Color("Academic_Level:N", title="Academic Level"),
+                color=alt.Color("Academic_Level:N", title="Academic Level",
+                scale=alt.Scale(
+                domain=["Undergraduate", "Graduate"],
+                range=["#1e3a6e", "#5ba4cf"],
+            )),
                 tooltip=[
                     alt.Tooltip("Academic_Level:N", title="Academic Level"),
                     alt.Tooltip("Count:Q", title="Students"),
