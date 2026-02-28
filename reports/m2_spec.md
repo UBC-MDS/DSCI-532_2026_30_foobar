@@ -16,7 +16,7 @@
 | `f_academiclvl`  | Input   | `ui.input_select()`     | —                            |  1   |
 | `f_country`  | Input         | `ui.input_selectize()`     | —                            |  4   |
 | `f_platform`  | Input         | `ui.input_selectize()`     | —                            |  3  |
-| `filtered_df` | Reactive calc | `@reactive.calc`        | `input_gender`, `input_age`, `input_country`, `input_academiclvl`, `input_platform` | 1,2,3,4 | 
+| `filtered_df` | Reactive calc | `@reactive.calc`        | `f_gender`, `f_age`, `f_country`, `f_academiclvl`, `f_platform` | 1,2,3,4 | 
 | `plot_AAP`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
 | `donut_academic_level`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
 | `plot_platformdist`  | Output        | `@render_altair`          | `filtered_df`                |     3    |
