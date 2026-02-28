@@ -134,7 +134,7 @@ def server(input, output, session):
     # For now, filtered() just returns the full dataset.
 
     @reactive.calc
-    def filtered():
+    def filtered_df():
 
         df = df[df["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
@@ -180,13 +180,13 @@ def server(input, output, session):
     # ── Chart 1: Does social media affect academic performance? ─────────────────────────
     @render_altair
     def plot_AAP():
-
+        df = filtered_df
         #calculate the percentage
         percent = (df.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
 
         chart = alt.Chart(percent).mark_bar().encode(
-            alt.Y("Affects_Academic_Performance:N"),
+            alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
             alt.X("Percentage:Q", title = "Percentage of Students"),
             tooltip = [alt.Tooltip("Affects_Academic_Performance:N", title = "Affects Academic Performance?"),
             alt.Tooltip("Count:Q", title = "Number of Students"),
@@ -209,8 +209,11 @@ def server(input, output, session):
     # ── Chart 3: Academic Level Distribution ───────────────────────────────────
     @render_altair
     def plot_academiclvldist():
-        
-        chart = alt.Chart().mark_bar().encode(
+        df = filtered_df
+
+        group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
+
+        chart = alt.Chart(group_gender_df).mark_bar().encode(
             alt.X("Academic_Level:N",
                 title = "Academic Level Distribution",
                 sort = ["Undergraduate", "Graduate"]),
@@ -223,6 +226,7 @@ def server(input, output, session):
                     domain = ["Male", "Female"]),
                     legend=alt.Legend(title="Gender")
                     ),
+            order = alt.Order("Gender:N", sort="ascending"),
             tooltip = [alt.Tooltip("Academic_Level:N", title="Academic Level"),
             alt.Tooltip("Gender:N", title="Gender"),
             alt.Tooltip("Count:Q", title="Number of Students")
