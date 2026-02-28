@@ -130,12 +130,9 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Academic Level"),
-                ui.p(
-                    "[ Donut chart: Undergraduate vs Graduate ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("donut_academic_level"),
                 full_screen=True,
-            ),
+                ),
 
             ui.card(
                 ui.card_header("Academic Level Distribution"),
@@ -145,12 +142,9 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Platform Distribution"),
-                ui.p(
-                    "[ Donut chart: share by most-used platform ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("donut_platform"),
                 full_screen=True,
-            ),
+                ),
 
             col_widths=[3, 3, 3, 3],
         ),
@@ -378,13 +372,79 @@ def server(input, output, session):
         return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
-    # TODO: Implement and uncomment when the UI card uses output_widget("chart_platform")
 
-    # @render_plotly
-    # def chart_platform():
-    #     ...
-
-    pass 
+    @render_altair
+    def donut_platform():
+        d= filtered_df()
+        
+        platform_counts = (
+        d.groupby("Most_Used_Platform")
+        .size()
+        .reset_index(name="Count")
+        )
+        
+        donut = (
+        alt.Chart(platform_counts)
+        .mark_arc(innerRadius=60)
+        .encode(
+            theta=alt.Theta("Count:Q"),
+            color=alt.Color("Most_Used_Platform:N", title="Platform"),
+            tooltip=[
+                alt.Tooltip("Most_Used_Platform:N", title="Platform"),
+                alt.Tooltip("Count:Q", title="Students"),
+            ],
+        )
+        )
+        
+        total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
+        
+        center_text = (
+        alt.Chart(pd.DataFrame({"text": [f"The Total is {total}"]}))
+        .mark_text(align="center", baseline="middle", fontSize=16)
+        .encode(text="text:N")
+        )
+        
+        return (donut + center_text).properties(height=280)
+    
+    # ── Chart 2: Academic Level ───────────────────────────────
+    @render_altair
+    def donut_academic_level():
+        d = filtered_df()
+        
+        level_counts = (
+        d.groupby("Academic_Level")
+        .size()
+        .reset_index(name="Count")
+        )
+        
+        donut = (
+        alt.Chart(level_counts)
+        .mark_arc(innerRadius=60)
+        .encode(
+            theta=alt.Theta("Count:Q"),
+            color=alt.Color("Academic_Level:N", title="Academic Level"),
+            tooltip=[
+                alt.Tooltip("Academic_Level:N", title="Academic Level"),
+                alt.Tooltip("Count:Q", title="Students"),
+            ],
+        )
+        
+        )
+        
+        total = int(level_counts["Count"].sum()) if len(level_counts) else 0
+        
+        center_text = (
+        alt.Chart(pd.DataFrame({"text": [f"The Total is {total}"]}))
+        .mark_text(align="center", baseline="middle", fontSize=16)
+        .encode(text="text:N")
+        
+        )
+        
+        return (donut + center_text).properties(height=280)
+        
+        
+    
+        
 
 # ── APP ───────────────────────────────────────────────────────────────
 
