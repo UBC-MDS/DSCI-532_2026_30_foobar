@@ -59,15 +59,48 @@ app_ui = ui.page_fluid(
 
             ui.h6("Filters"),
 
-            # TODO: Add filter controls here
-            # Examples:
-            #   ui.input_radio_buttons(...)   → Gender
-            #   ui.input_slider(...)          → Age range
-            #   ui.input_select(...)          → Academic level
-            #   ui.input_selectize(...)       → Country, Platform
-            #   ui.input_action_button(...)   → Reset button
+            # Filter 1: Gender (radio buttons)
+            ui.input_radio_buttons(
+                id="f_gender",
+                label="Gender",
+                choices={"All": "All", "Male": "Male", "Female": "Female"},
+                selected="All",
+                inline=True,
+            ),
 
-            ui.p("[ Filters go here ]", style="color: gray; font-style: italic;"),
+            # Filter 2: Age range (slider with two handles)
+            ui.input_slider(
+                id="f_age",
+                label="Age range",
+                min=AGE_MIN,
+                max=AGE_MAX,
+                value=[AGE_MIN, AGE_MAX],
+            ),
+
+            # Filter 3: Academic level (single dropdown)
+            ui.input_select(
+                id="f_level",
+                label="Academic level",
+                choices={"All": "All", "Undergraduate": "Undergraduate", "Graduate": "Graduate"},
+                selected="All",
+            ),
+
+            # Filter 4: Country (multi-select)
+            ui.input_selectize(
+                id="f_country",
+                label="Country",
+                choices=sorted(df["Country"].unique().tolist()),
+                multiple=True,
+            ),
+
+            # Filter 5: Platform (multi-select)
+            ui.input_selectize(
+                id="f_platform",
+                label="Platform",
+                choices=sorted(df["Most_Used_Platform"].unique().tolist()),
+                multiple=True,
+            ),
+
 
             open="desktop",
         ),
@@ -151,14 +184,20 @@ def server(input, output, session):
         data = df.copy()
         data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
-        # Uncomment these lines once the UI inputs are added to the sidebar:
-        # if input.academiclvl() != "All":
-        #     data = data[data["Academic_Level"] == input.academiclvl()] 
-        # 
-        # if input.gender() != "All":
-        #     data = data[data["Gender"] == input.gender()] 
-        # 
-        # data = data[data["Age"].between(input.age()[0], input.age()[1])]
+        if input.f_gender() != "All":
+            data = data[data["Gender"] == input.f_gender()]
+
+        age_low, age_high = input.f_age()
+        data = data[(data["Age"] >= age_low) & (data["Age"] <= age_high)]
+
+        if input.f_level() != "All":
+            data = data[data["Academic_Level"] == input.f_level()]
+
+        if input.f_country():  # empty tuple means "all countries"
+            data = data[data["Country"].isin(input.f_country())]
+
+        if input.f_platform():
+            data = data[data["Most_Used_Platform"].isin(input.f_platform())]
 
         return data
 
