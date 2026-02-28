@@ -101,6 +101,7 @@ app_ui = ui.page_fluid(
                 multiple=True,
             ),
 
+
             open="desktop",
         ),
 
@@ -183,14 +184,20 @@ def server(input, output, session):
         data = df.copy()
         data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
-        # Uncomment these lines once the UI inputs are added to the sidebar:
-        # if input.academiclvl() != "All":
-        #     data = data[data["Academic_Level"] == input.academiclvl()] 
-        # 
-        # if input.gender() != "All":
-        #     data = data[data["Gender"] == input.gender()] 
-        # 
-        # data = data[data["Age"].between(input.age()[0], input.age()[1])]
+        if input.f_gender() != "All":
+            data = data[data["Gender"] == input.f_gender()]
+
+        age_low, age_high = input.f_age()
+        data = data[(data["Age"] >= age_low) & (data["Age"] <= age_high)]
+
+        if input.f_level() != "All":
+            data = data[data["Academic_Level"] == input.f_level()]
+
+        if input.f_country():  # empty tuple means "all countries"
+            data = data[data["Country"].isin(input.f_country())]
+
+        if input.f_platform():
+            data = data[data["Most_Used_Platform"].isin(input.f_platform())]
 
         return data
 
