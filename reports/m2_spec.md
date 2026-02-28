@@ -21,11 +21,11 @@
 | `donut_academic_level`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
 | `plot_platformdist`  | Output        | `@render_altair`          | `filtered_df`                |     3    |
 | `donut_platform`  | Output        | `@render_altair`          | `filtered_df`                |    1     |
-| `num_total_student`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
-| `num_avg_daily_uage`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
-| `num_avg_hrs_sleep`  | Output        | `@render_altair`          | `filtered_df`                |     2    |
-| `num_avg_add_score`  | Output        | `@render_altair`          | `filtered_df`                |    1,2,3,4     |
-| `txt_most_used_platf`  | Output        | `@render_altair`          | `filtered_df`                |    3     |
+| `tile_students`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
+| `tile_usage`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
+| `tile_sleep`  | Output        | `@render_altair`          | `filtered_df`                |     2    |
+| `tile_addiction`  | Output        | `@render_altair`          | `filtered_df`                |    1,2,3,4     |
+| `scatter_chart`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
 | `get_iso3`  | Output        | `@render_widget`          | `filtered_df`                |    4     |
 
 ### 3 Reactivity Diagram
@@ -37,25 +37,25 @@ Example:
 
 ```mermaid
 flowchart TD
-  A[/input_gender/] --> F{{filtered_df}}
-  B[/input_age/] --> F
-  C[/input_academiclvl/] --> F
-  D[/input_country/] --> F
-  E[/input_platform/] --> F
+  A[/f_gender/] --> F{{filtered_df}}
+  B[/f_age/] --> F
+  C[/f_academiclvl/] --> F
+  D[/f_country/] --> F
+  E[/f_platform/] --> F
   F --> P1([plot_AAP])
-  F --> P2([plot_academiclvl])
+  F --> P2([donut_academic_level])
   F --> P3([plot_platformdist])
-  F --> P4([txt_most_used_platf])
-  F --> P5([num_total_student])
-  F --> P6([num_avg_daily_uage])
-  F --> P7([num_avg_hrs_sleep])
-  F --> P8([num_avg_add_score])
-  F --> P9([txt_most_used_platf])
-  F --> P10([Map])
+  F --> P4([donut_platform])
+  F --> P5([tile_students])
+  F --> P6([tile_usage])
+  F --> P7([tile_sleep])
+  F --> P8([tile_addiction])
+  F --> P9([scatter_chart])
+  F --> P10([get_iso3])
 ```
 
 ### 4 Calculation Details
 
 For each `@reactive.calc` in your diagram, briefly describe:
 
-`filered_df` depends on all five inputs (`input_gender`, `input_age`, `input_academiclvl`, `input_country`, `input_platform`). Then `@reactive.calc` dynamically filters rows based on the selected inputs the user provided with each input acts as an optional filter. For instance, `input_gender` and `input_academiclvl` inputs are provided, it filters rows based on the selected gender and academic level(s). All outputs consumes it and recompute in reponse to the changes in `filtered_df`.
+`filered_df` depends on all five inputs (`f_gender`, `f_age`, `f_academiclvl`, `f_country`, `f_platform`). Then `@reactive.calc` dynamically filters rows based on the selected inputs the user provided with each input acts as an optional filter. For instance, `f_gender` and `f_academiclvl` inputs are provided, it filters rows based on the selected gender and academic level(s). All outputs consumes it and recompute in reponse to the changes in `filtered_df`.
