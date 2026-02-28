@@ -180,7 +180,7 @@ def server(input, output, session):
     # ── Chart 1: Does social media affect academic performance? ─────────────────────────
     @render_altair
     def plot_AAP():
-        df = filtered_df
+        df = filtered_df()
         #calculate the percentage
         percent = (df.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
@@ -209,7 +209,7 @@ def server(input, output, session):
     # ── Chart 3: Academic Level Distribution ───────────────────────────────────
     @render_altair
     def plot_academiclvldist():
-        df = filtered_df
+        df = filtered_df()
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
