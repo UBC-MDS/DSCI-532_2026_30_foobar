@@ -33,6 +33,12 @@ shiny run app.py
 ```
 You will be able to access the app at the link displayed in the command line.
 
+#### Stable (main): 
+https://019ca108-2c5a-f4a9-1093-cdd4a540d77d.share.connect.posit.cloud/
+
+#### Preview (dev): 
+https://019ca127-fdc0-0c6d-1031-e1462c7abb05.share.connect.posit.cloud/
+
 ## Team Members
 
 - Yin Tiantong  
