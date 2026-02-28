@@ -135,18 +135,18 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered_df():
-
-        df = df[df["Academic_Level"].isin(["Undergraduate", "Graduate"])]
+        data = df.copy()
+        data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
 
         if input.academiclvl() != "All":
-            df = df[df["Academic_Level"] == input.academic_level()] 
+            data = data[data["Academic_Level"] == input.academiclvl()] 
         
         if input.gender() != "All":
-            df = df[df["Gender"] == input.academic_level()] 
+            data = data[data["Gender"] == input.gender()] 
         
-        df = df[df["Age"].between(input.input_age()[0], input.input_age()[1])]
+        data = data[data["Age"].between(input.age()[0], input.age()[1])]
 
-        return df.copy()
+        return data
 
     # ── Stat tiles ────────────────────────────────────────────────────
     # TODO: Uncomment and wire up once value_box uses output_text(...)
@@ -180,10 +180,12 @@ def server(input, output, session):
     # ── Chart 1: Does social media affect academic performance? ─────────────────────────
     @render_altair
     def plot_AAP():
-        df = filtered_df()
+        df1 = filtered_df()
         #calculate the percentage
-        percent = (df.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
+        percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
+        percent["label"] = percent["Percentage"].astype(str) + "%"
+
 
         chart = alt.Chart(percent).mark_bar().encode(
             alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
@@ -193,11 +195,7 @@ def server(input, output, session):
             alt.Tooltip("Percentage:Q", title = "Percentage of Students being Affected")]
         )
 
-        chart + chart.mark_text(align = "left").encode(text = alt.Text("Percentage:Q",format='.0%'), 
-        color=alt.value('black'))
-
-        return chart
-
+        return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
 
     # ── Chart 2: Academic Level ───────────────────────────────────────
     # TODO: Implement and uncomment when the UI card uses output_widget("chart_level")
@@ -215,7 +213,7 @@ def server(input, output, session):
 
         chart = alt.Chart(group_gender_df).mark_bar().encode(
             alt.X("Academic_Level:N",
-                title = "Academic Level Distribution",
+                title = "Academic Level",
                 sort = ["Undergraduate", "Graduate"]),
 
             alt.Y("Count:Q",
