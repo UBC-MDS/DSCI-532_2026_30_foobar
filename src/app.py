@@ -169,6 +169,12 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
 
+    custom_ui_scale = alt.Scale(
+        range=['#0F1F3D', '#2D6BE4', '#5bddf6'],
+        type='linear'
+    )
+    
+
     # ── Filtered data ─────────────────────────────────────────────────
     # TODO: Add filter logic here once sidebar inputs are wired up.
     # For now, filtered_df() just returns the full dataset.
@@ -237,7 +243,7 @@ def server(input, output, session):
             color=alt.Color(
                 "Sleep_Hours_Per_Night", 
                 title="Sleep Time (hrs)", 
-                scale=alt.Scale(scheme="viridis")
+                scale=custom_ui_scale#alt.Scale(scheme="viridis")
             ),
             tooltip=["Addicted_Score", "Mental_Health_Score", "Sleep_Hours_Per_Night"]
         ).interactive()
@@ -289,7 +295,11 @@ def server(input, output, session):
             locations='iso_alpha',
             locationmode='ISO-3',
             color='Addicted_Score',
-            color_continuous_scale='viridis',
+            color_continuous_scale=[
+                [0.0, '#0F1F3D'],
+                [0.5, '#2D6BE4'],
+                [1.0, '#5bddf6']
+            ],#'viridis',
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name='Country',
             labels={
@@ -375,36 +385,32 @@ def server(input, output, session):
 
     @render_altair
     def donut_platform():
-        d= filtered_df()
+        d = filtered_df()
         
         platform_counts = (
-        d.groupby("Most_Used_Platform")
-        .size()
-        .reset_index(name="Count")
-        )
-        
-        donut = (
-        alt.Chart(platform_counts)
-        .mark_arc(innerRadius=60)
-        .encode(
-            theta=alt.Theta("Count:Q"),
-            color=alt.Color("Most_Used_Platform:N", title="Platform"),
-            tooltip=[
-                alt.Tooltip("Most_Used_Platform:N", title="Platform"),
-                alt.Tooltip("Count:Q", title="Students"),
-            ],
-        )
+            d.groupby("Most_Used_Platform")
+            .size()
+            .reset_index(name="Count")
         )
         
         total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
         
-        center_text = (
-        alt.Chart(pd.DataFrame({"text": [f"The Total is {total}"]}))
-        .mark_text(align="center", baseline="middle", fontSize=16)
-        .encode(text="text:N")
-        )
+        if total > 0:
+            platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).round(1).astype(str) + "%"
+        else:
+            platform_counts["Percentage"] = []
+            
+        donut = alt.Chart(platform_counts).encode(
+            theta=alt.Theta("Count:Q", stack=True),
+            color=alt.Color("Most_Used_Platform:N", title="Platform"),
+            tooltip=[
+                alt.Tooltip("Most_Used_Platform:N", title="Platform"),
+                alt.Tooltip("Count:Q", title="Students"),
+                alt.Tooltip("Percentage:N", title="Percentage"),
+            ],
+        ).mark_arc(innerRadius=30)
         
-        return (donut + center_text).properties(height=280)
+        return donut
     
     # ── Chart 2: Academic Level ───────────────────────────────
     @render_altair
@@ -417,30 +423,29 @@ def server(input, output, session):
         .reset_index(name="Count")
         )
         
-        donut = (
-        alt.Chart(level_counts)
-        .mark_arc(innerRadius=60)
-        .encode(
-            theta=alt.Theta("Count:Q"),
-            color=alt.Color("Academic_Level:N", title="Academic Level"),
-            tooltip=[
-                alt.Tooltip("Academic_Level:N", title="Academic Level"),
-                alt.Tooltip("Count:Q", title="Students"),
-            ],
-        )
         
-        )
         
         total = int(level_counts["Count"].sum()) if len(level_counts) else 0
+
+        if total > 0:
+            level_counts["Percentage"] = (level_counts["Count"] / total * 100).round(1).astype(str) + "%"
+        else:
+            level_counts["Percentage"] = []
+
+        donut = (
+            alt.Chart(level_counts)
+            .encode(
+                theta=alt.Theta("Count:Q"),
+                color=alt.Color("Academic_Level:N", title="Academic Level"),
+                tooltip=[
+                    alt.Tooltip("Academic_Level:N", title="Academic Level"),
+                    alt.Tooltip("Count:Q", title="Students"),
+                    alt.Tooltip("Percentage:N", title="Percentage"),
+                ],
+            )
+        ).mark_arc(innerRadius=30)
         
-        center_text = (
-        alt.Chart(pd.DataFrame({"text": [f"The Total is {total}"]}))
-        .mark_text(align="center", baseline="middle", fontSize=16)
-        .encode(text="text:N")
-        
-        )
-        
-        return (donut + center_text).properties(height=280)
+        return donut
         
         
     
