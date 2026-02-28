@@ -1,6 +1,6 @@
 # Social Media Addiction Analytics Dashboard
 
-### Project Summary
+### Project Summary & Motivation
 
 This project presents an interactive data visualization dashboard designed to explore patterns in social media usage and addiction among students. The dashboard allows users to explore the correlation between daily usage hours, sleep duration, mental health scores, academic performance, and preferred platforms.
 
@@ -10,7 +10,7 @@ The dashboard is intended for school administrators, counselors, and students se
 
 ![Dashboard Demo](img/demo.gif)
 
-### Setup
+### Setup (for contributors)
 First, clone the repository and navigate into the project directory:
 
 ```bash
