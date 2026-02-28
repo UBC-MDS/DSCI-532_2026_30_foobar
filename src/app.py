@@ -92,10 +92,7 @@ app_ui = ui.page_fluid(
 
             ui.card(
                 ui.card_header("Affects Academic Performance"),
-                ui.p(
-                    "[ Horizontal bar: % Yes vs No ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                output_widget("plot_AAP"),
                 full_screen=True,
             ),
 
@@ -109,11 +106,8 @@ app_ui = ui.page_fluid(
             ),
 
             ui.card(
-                ui.card_header("Sleep Distribution"),
-                ui.p(
-                    "[ Bar chart: students per sleep bucket (<5h, 5-6h, ...) ]",
-                    style="color: gray; font-style: italic; padding: 40px; text-align: center;",
-                ),
+                ui.card_header("Academic Level Distribution"),
+                output_widget("plot_academiclvldist"),
                 full_screen=True,
             ),
 
