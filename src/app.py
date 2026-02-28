@@ -48,7 +48,38 @@ MAX_SCORE = df["Addicted_Score"].max()
 
 # ── UI ───────────────────────────────────────────────────────────────
 
+custom_css = """
+body {
+    background-color: #F4F6F9 !important;
+}
+
+.bslib-page-sidebar {
+    background-color: #A8B8CC !important;
+    color: #0F1F3D !important;
+}
+
+.bslib-sidebar {
+    background-color: #2c3e50 !important;
+    color: #ecf0f1 !important;
+}
+
+.bslib-sidebar p, 
+.bslib-sidebar div {
+    color: #ecf0f1 !important;
+}
+
+.card-header {
+    background-color: #A8B8CC !important;
+    color: #0F1F3D !important;
+    font-weight: bold;
+}
+"""
+
 app_ui = ui.page_fluid(
+
+    ui.head_content(
+        ui.tags.style(custom_css)
+    ),
 
     ui.panel_title("Social Media Addiction Dashboard"),
 
@@ -170,7 +201,7 @@ app_ui = ui.page_fluid(
 def server(input, output, session):
 
     custom_ui_scale = alt.Scale(
-        range=['#0F1F3D', '#2D6BE4', '#5bddf6'],
+        range=['#0F1F3D', '#2D6BE4', '#26f7fd'],
         type='linear'
     )
     
@@ -297,8 +328,8 @@ def server(input, output, session):
             color='Addicted_Score',
             color_continuous_scale=[
                 [0.0, '#0F1F3D'],
-                [0.5, '#2D6BE4'],
-                [1.0, '#5bddf6']
+                [0.3, '#517BD6'],
+                [1.0, '#26f7fd']
             ],#'viridis',
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name='Country',
