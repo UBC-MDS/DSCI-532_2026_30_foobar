@@ -14,7 +14,6 @@ import altair as alt
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, render_altair, output_widget
 from pathlib import Path
-import altair as alt
 from querychat import QueryChat
 from dotenv import load_dotenv
 
@@ -116,11 +115,24 @@ body {
 
 app_ui = ui.page_fluid(
 
+    ui.tags.head(
+        ui.tags.link(
+            rel="stylesheet",
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        )
+    ),
+
     ui.head_content(
         ui.tags.style(custom_css)
     ),
 
     ui.panel_title("Social Media Addiction Dashboard"),
+    ui.HTML('<p style="color:#5a5a7a; font-size:13px; margin-top:-10px;">Explore social media usage patterns among students</p>'),
+
+    ui.div(
+    ui.HTML('<a href="https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction" target="_blank" style="position:absolute; top:10px; right:20px;"><i class="fa-brands fa-github" style="font-size:1.5rem; color:#1e3a6e;"></i></a>'),
+    style="text-align:right; padding:10px;"
+    ),
 
     ui.navset_tab(
         ui.nav_panel("Dashboard",
@@ -137,13 +149,13 @@ app_ui = ui.page_fluid(
                         label="Gender",
                         choices={"All": "All", "Male": "Male", "Female": "Female"},
                         selected="All",
-                        inline=True,
+                        inline=False,
                     ),
 
                     # Filter 2: Age range (slider with two handles)
                     ui.input_slider(
                         id="f_age",
-                        label="Age range",
+                        label="Age Range",
                         min=AGE_MIN,
                         max=AGE_MAX,
                         value=[AGE_MIN, AGE_MAX],
@@ -152,7 +164,7 @@ app_ui = ui.page_fluid(
                     # Filter 3: Academic level (single dropdown)
                     ui.input_select(
                         id="f_level",
-                        label="Academic level",
+                        label="Academic Level",
                         choices={"All": "All", "Undergraduate": "Undergraduate", "Graduate": "Graduate"},
                         selected="All",
                     ),
@@ -168,7 +180,7 @@ app_ui = ui.page_fluid(
                     # Filter 5: Platform (multi-select)
                     ui.input_selectize(
                         id="f_platform",
-                        label="Platform",
+                        label="Social Media Platform",
                         choices=sorted(df["Most_Used_Platform"].unique().tolist()),
                         multiple=True,
                     ),
@@ -182,35 +194,52 @@ app_ui = ui.page_fluid(
                 # ── MAIN AREA ─────────────────────────────────────────────────
                 # Row 1: Summary stat tiles
                 ui.layout_columns(
-                    ui.value_box("Total Students", ui.output_text("tile_students")),
-                    ui.value_box("Avg Daily Usage", ui.output_text("tile_usage")),
-                    ui.value_box("Avg Sleep Hours", ui.output_text("tile_sleep")),
-                    ui.value_box("Avg Addiction Score", ui.output_text("tile_addiction")),
+                    ui.value_box( title = "Total Students", 
+                                value = ui.output_text("tile_students"),
+                                showcase= ui.HTML('<i class="fa-solid fa-graduation-cap" style="font-size:3rem"></i>')
+                                ),
+                    ui.value_box(title = "Avg Daily Usage", 
+                                value = ui.output_text("tile_usage"),
+                                showcase = ui.HTML('<i class="fa-solid fa-display" style="font-size:3rem"></i>')
+                                ),
+                    ui.value_box(title = "Avg Sleep Hours", 
+                                value = ui.output_text("tile_sleep"),
+                                showcase = ui.HTML('<i class="fa-solid fa-bed" style="font-size:3rem"></i>')
+                                ),
+                    ui.value_box(title = "Avg Addiction Score", 
+                                value = ui.output_text("tile_addiction"),
+                                showcase = ui.HTML('<i class="fa-solid fa-circle-exclamation" style="font-size:3rem"></i>')
+                                ),
                     fill=False,
                 ),
 
                 # Row 2: Four chart placeholders in a 2x2 grid
                 ui.layout_columns(
+
                     ui.card(
-                        ui.card_header("Affects Academic Performance"),
+                        ui.card_header("Impact on Academic Performance"),
                         output_widget("plot_AAP"),
                         full_screen=True,
                     ),
+
                     ui.card(
                         ui.card_header("Academic Level"),
                         output_widget("donut_academic_level"),
                         full_screen=True,
-                    ),
+                        ),
+
                     ui.card(
-                        ui.card_header("Academic Level Distribution"),
+                        ui.card_header("Academic Level Distribution by Gender"),
                         output_widget("plot_academiclvldist"),
                         full_screen=True,
                     ),
+
                     ui.card(
-                        ui.card_header("Platform Distribution"),
-                        output_widget("donut_platform"),
+                        ui.card_header("Social Media Platform Distribution"),
+                        output_widget("sunburst_platform"),
                         full_screen=True,
-                    ),
+                        ),
+
                     col_widths=[3, 3, 3, 3],
                 ),
 
@@ -222,7 +251,7 @@ app_ui = ui.page_fluid(
                         full_screen=True,
                     ),
                     ui.card(
-                        ui.card_header("Avg Addiction Score by Country"),
+                        ui.card_header("Average Addiction Score by Country"),
                         output_widget("map_chart"),
                         full_screen=True,
                     ),
@@ -263,13 +292,13 @@ app_ui = ui.page_fluid(
                 # Row 2: Four chart placeholders in a 2x2 grid
                 ui.layout_columns(
                     ui.card(
-                        ui.card_header("Affects Academic Performance"),
+                        ui.card_header("Impact on Academic Performance"),
                         output_widget("plot_AAP_bot"),
                         full_screen=True,
                     ),
                    
                     ui.card(
-                        ui.card_header("Academic Level Distribution"),
+                        ui.card_header("Academic Level Distribution by Gender"),
                         output_widget("plot_academiclvldist_bot"),
                         full_screen=True,
                     ),
@@ -301,8 +330,6 @@ def server(input, output, session):
     
 
     # ── Filtered data ─────────────────────────────────────────────────
-    # TODO: Add filter logic here once sidebar inputs are wired up.
-    # For now, filtered_df() just returns the full dataset.
 
     @reactive.calc
     def filtered_df():
@@ -328,7 +355,6 @@ def server(input, output, session):
 
 
     # ── Stat tiles ────────────────────────────────────────────────────
-    # TODO: Uncomment and wire up once value_box uses output_text(...)
 
     @render.text
     def tile_students():
@@ -381,26 +407,7 @@ def server(input, output, session):
     @render_plotly
     def map_chart():
         d = filtered_df().copy()
-        #d = d[d['Country'].isin(['Canada', 'Mexico'])]
         
-        #selected_country = d['Country'].unique()
-        #df_selected = df_all_country[df_all_country['Country'].isin(selected_country)]
-        #df_unselected = df_all_country[~df_all_country['Country'].isin(selected_country)]
-
-        #fig_unselected = px.choropleth(
-        #    df_unselected,
-        #    locations='Country',
-        #    locationmode='country names',
-        #    color='Addicted_Score',
-        #    color_continuous_scale='Reds',
-        #    range_color=[MIN_SCORE, MAX_SCORE]
-        #)
-        #fig_unselected.update_traces(
-        #    marker = dict(opacity=0.2),
-        #    hoverinfo = 'skip',
-        #    hovertemplate = None,
-        #)
-
         df_selected = d.groupby("Country", as_index=False).agg({
             "Student_ID": "count",
             "Avg_Daily_Usage_Hours": "mean",
@@ -449,7 +456,7 @@ def server(input, output, session):
         #fig.add_trace(fig_unselected.data[0])
         fig.update_geos(fitbounds="locations", showframe=False)
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-        
+        fig.update_traces(marker=dict(line=dict(color="black", width=1.5)))
         return fig
 
     # ── Chart 1: Does social media affect academic performance? ─────────────────────────
@@ -474,6 +481,63 @@ def server(input, output, session):
         )
 
         return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
+
+    # ── Chart 2: Academic Level ───────────────────────────────
+
+    @render_plotly
+    def donut_academic_level():
+        d = filtered_df()
+
+        level_counts = (
+            d.groupby("Academic_Level")
+            .size()
+            .reset_index(name="Count")
+        )
+
+        total = int(level_counts["Count"].sum()) if len(level_counts) else 0
+
+        if total > 0:
+            level_counts["Percentage"] = (level_counts["Count"] / total * 100).astype(str) + "%"
+        else:
+            level_counts["Percentage"] = []
+
+        fig = px.pie(
+            level_counts,
+            names="Academic_Level",
+            values="Count",
+            color="Academic_Level",
+            color_discrete_map={
+                "Undergraduate": "#1e3a6e",
+                "Graduate":      "#5ba4cf",
+            },
+            hole=0.4,
+            custom_data=["Percentage"],
+        )
+
+        fig.update_traces(
+            textinfo="percent",
+            #textposition="outside",
+            #automargin=True,
+            hovertemplate=(
+                "<b>%{label}</b><br>"
+                "Students: %{value}<br>"
+                #"Percentage: %{percentEntry:.1%}<extra></extra>"
+            ),
+            textfont=dict(size=10, color="white"),
+            domain=dict(x=[0, 0.6]),
+        )
+
+        fig.update_layout(
+            legend=dict(
+                orientation="v",
+                x=0.62,
+                y=0.5,
+                xanchor="left",
+                yanchor="middle"
+            ),
+        )
+
+        return fig
 
     # ── Chart 3: Academic Level Distribution ───────────────────────────────────
     @render_altair
@@ -506,83 +570,72 @@ def server(input, output, session):
         return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
-
-    @render_altair
-    def donut_platform():
+    @render_plotly
+    def sunburst_platform():
         d = filtered_df()
-        
         platform_counts = (
-            d.groupby("Most_Used_Platform")
-            .size()
-            .reset_index(name="Count")
+            d.groupby(["Gender", "Most_Used_Platform"])
+            .agg(Count=("Gender", "size"))
+            .reset_index()
         )
+
+        color_map = {"Facebook":  "#1e3a6e",
+                    "Instagram": "#2d6be4",
+                    "KakaoTalk": "#5ba4cf",
+                    "LINE":      "#4f6bed",
+                    "LinkedIn":  "#7b8fab",
+                    "Snapchat":  "#a8b8cc",
+                    "TikTok":    "#0f1f3d",
+                    "Twitter":   "#3a5a9e",
+                    "VKontakte": "#6d8fc0",
+                    "WeChat":    "#b8c8e0",
+                    "WhatsApp":  "#d0dff0",
+                    "YouTube":   "#bfd4e8",
+                    "Other":     "#4a5a6e",
+                    "Female":    "#5ba4cf", 
+                    "Male":      "#1e3a6e",
+                }
         
-        total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
-        
-        if total > 0:
-            platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).round(1).astype(str) + "%"
-        else:
-            platform_counts["Percentage"] = []
-            
-        donut = alt.Chart(platform_counts).encode(
-            theta=alt.Theta("Count:Q", stack=True),
-            color=alt.Color("Most_Used_Platform:N", title="Platform",
-            scale=alt.Scale(
-                domain=["Facebook", "Instagram", "KakaoTalk", "LINE", "LinkedIn",
-                        "Snapchat", "TikTok", "Twitter", "VKontakte",
-                        "WeChat", "WhatsApp", "YouTube"],
-                range=["#1e3a6e", "#2d6be4", "#5ba4cf", "#4f6bed", "#7b8fab",
-                       "#a8b8cc", "#0f1f3d", "#3a5a9e", "#6d8fc0", "#b8c8e0", "#d0dff0", "#bfd4e8"],
-            )),
-            tooltip=[
-                alt.Tooltip("Most_Used_Platform:N", title="Platform"),
-                alt.Tooltip("Count:Q", title="Students"),
-                alt.Tooltip("Percentage:N", title="Percentage"),
-            ],
-        ).mark_arc(innerRadius=30)
-        
-        return donut
-    
-    # ── Chart 2: Academic Level ───────────────────────────────
-    @render_altair
-    def donut_academic_level():
-        d = filtered_df()
-        
-        level_counts = (
-        d.groupby("Academic_Level")
-        .size()
-        .reset_index(name="Count")
+        # Find top 6 platforms by total count
+        top_platforms = (
+            platform_counts.groupby("Most_Used_Platform")["Count"]
+            .sum()
+            .nlargest(6)
+            .index
         )
-        
-        
-        
-        total = int(level_counts["Count"].sum()) if len(level_counts) else 0
 
-        if total > 0:
-            level_counts["Percentage"] = (level_counts["Count"] / total * 100).round(1).astype(str) + "%"
-        else:
-            level_counts["Percentage"] = []
+        # Group smaller platforms into "Other"
+        platform_counts["Platform_Group"] = platform_counts["Most_Used_Platform"].apply(
+            lambda x: x if x in top_platforms else "Other"
+        )
 
-        donut = (
-            alt.Chart(level_counts)
-            .encode(
-                theta=alt.Theta("Count:Q"),
-                color=alt.Color("Academic_Level:N", title="Academic Level",
-                scale=alt.Scale(
-                domain=["Undergraduate", "Graduate"],
-                range=["#1e3a6e", "#5ba4cf"],
-            )),
-                tooltip=[
-                    alt.Tooltip("Academic_Level:N", title="Academic Level"),
-                    alt.Tooltip("Count:Q", title="Students"),
-                    alt.Tooltip("Percentage:N", title="Percentage"),
-                ],
+        total = int(platform_counts["Count"].sum())
+        platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).astype(str) + "%"
+
+
+        fig = px.sunburst(
+            platform_counts,
+            path=["Gender","Platform_Group"],
+            values="Count",
+            color="Platform_Group",
+            color_discrete_map=color_map,
+            custom_data=["Percentage"],
+        )
+
+        fig.update_traces(
+            textinfo="label+percent entry",
+            insidetextorientation="horizontal",
+            hovertemplate=(
+                "<b>%{label}</b><br>"
+                "Students: %{value}<br>"
+                "Percentage: %{percentEntry:.1%}<extra></extra>"
             )
-        ).mark_arc(innerRadius=30)
+        )
+        fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
+    
+        return fig
         
-        return donut
-        
-
+#####
     @render.data_frame
     def chat_df():
         return qc_data.df()
