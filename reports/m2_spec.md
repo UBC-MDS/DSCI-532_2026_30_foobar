@@ -18,15 +18,15 @@
 | `f_platform`  | Input         | `ui.input_selectize()`     | —                            |  3  |
 | `filtered_df` | Reactive calc | `@reactive.calc`        | `f_gender`, `f_age`, `f_country`, `f_academiclvl`, `f_platform` | 1,2,3,4 | 
 | `plot_AAP`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
-| `donut_academic_level`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
+| `donut_academic_level`  | Output        | `@render_plotly`          | `filtered_df`                |     1    |
 | `plot_platformdist`  | Output        | `@render_altair`          | `filtered_df`                |     3    |
-| `donut_platform`  | Output        | `@render_altair`          | `filtered_df`                |    1     |
+| `sunburst_platform`  | Output        | `@render_plotly`          | `filtered_df`                |    1     |
 | `tile_students`  | Output        | `@render_altair`          | `filtered_df`                |     1    |
 | `tile_usage`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
 | `tile_sleep`  | Output        | `@render_altair`          | `filtered_df`                |     2    |
 | `tile_addiction`  | Output        | `@render_altair`          | `filtered_df`                |    1,2,3,4     |
 | `scatter_chart`  | Output        | `@render_altair`          | `filtered_df`                |    2     |
-| `get_iso3`  | Output        | `@render_widget`          | `filtered_df`                |    4     |
+| `get_iso3`  | Output        | `@render_plotly`          | `filtered_df`                |    4     |
 
 ### 3 Reactivity Diagram
 - `[/Input/]` (Parallelogram) (or `[Input]` Rectangle) = reactive input
