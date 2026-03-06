@@ -102,6 +102,16 @@ body {
     height: 100% !important; 
     overflow-y: auto !important; 
 }
+#reset:hover {
+    background-color: #c0392b !important;
+    border-color: #c0392b !important;
+    color: white !important;
+}
+#download_csv:hover {
+    background-color: #1e3a6e !important;
+    border-color: #1e3a6e !important;
+    color: white !important;
+}
 """
 
 app_ui = ui.page_fluid(
@@ -236,15 +246,18 @@ app_ui = ui.page_fluid(
                     bg = "#EEF1F6",
                     fg = "#0F1F3D",
                 ),
-
-                ui.input_action_button("reset", "Reset Filters"),
+                ui.layout_columns(
+                    ui.input_action_button("reset", "Reset Filters"),
+                    ui.download_button("download_csv", "Download CSV")
+                ),
+                
 
                 # ── MAIN AREA ─────────────────────────────────────────────────
                 # Row 1: Summary stat tiles
                 ui.card(
                     ui.card_header("Filtered Data"),
                     ui.output_data_frame("chat_df"),
-                    ui.download_button("download_csv", "Download CSV")
+                    
                 ),
 
                 # Row 2: Four chart placeholders in a 2x2 grid
