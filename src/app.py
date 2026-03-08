@@ -49,8 +49,7 @@ MAX_SCORE = df["Addicted_Score"].max()
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
 greeting = "Hello! Welcome to your Social Media Addiction data dashboard. I'm here to help you filter, sort, and analyze the data."
-qc = QueryChat(df, "df", greeting=greeting, client="anthropic/claude-3-5-haiku-latest")
-
+qc = QueryChat(df, "df", greeting=greeting, client="anthropic/claude-3-5-haiku-20241022")
 
 
 # ── UI ───────────────────────────────────────────────────────────────
