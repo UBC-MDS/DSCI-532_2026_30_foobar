@@ -41,3 +41,31 @@ All four job stories defined in the M2 spec are fully implemented in this milest
 **Layout on M2 Spec vs M1 Sketch**
 
 The final layout is largely consistent with the M2 spec. The one meaningful departure from both the M1 sketch and the original spec was the addition of the interactive choropleth map (`get_iso3`) as a dedicated output component for Job Story 4. The M1 sketch had only implied a tabular or list-based country comparison; the map provides a richer spatial view of similar-profile countries. The component inventory in the spec has been updated above to reflect this. All other panels — filters sidebar, metric tiles row, and the chart grid — match the spec as written.
+
+## [0.3.0] - 2026-03-07
+
+### Added
+- AI-powered chatbot tab with querychat interface for filtering and interacting with the dataset
+- Dataframe output component on the AI tab displaying the querychat-filtered results
+- Interactive plot visualization on the AI tab using the querychat-filtered dataframe
+- Data download button to export the filtered dataframe as a CSV
+- `dotenv`, `querychat`, and related dependencies to `environment.yml` and `requirements.txt`
+- Black border and tooltip on the choropleth map for countries with no data, so boundaries are still visible
+- Subtitle to the dashboard
+- Clickable GitHub icon in the upper-right corner of the dashboard
+- Icons for the summary statistic cards
+- Percentage labels to the Academic Level donut chart
+
+### Changed
+- Replaced Social Media Platform Distribution donut chart with a sunburst chart; top 6 platforms are labelled individually and remaining platforms are collapsed into "Other"
+- Gender radio buttons are now aligned vertically
+- Filter label renamed: "Platform" → "Social Media Platform"
+- Chart titles updated: "Avg Addiction Score by Country" → "Average Addiction Score by Country", "Affects on Academic Performance" → "Impact on Academic Performance"
+- Updated `m2_spec.md`: renamed `donut_platform` → `sunburst_platform` and corrected renderer references
+- Fixed CSS compatibility issues with Chrome
+
+### Fixed
+- Countries with no data now render with a visible boundary on the map instead of being invisible
+
+### Deployment
+- Application redeployed on Connect Cloud with environment variables configured for the AI/querychat component
