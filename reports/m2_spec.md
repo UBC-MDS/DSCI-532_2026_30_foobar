@@ -61,7 +61,8 @@ flowchart TD
   F --> P8([tile_addiction])
   F --> P9([scatter_chart])
   F --> P10([get_iso3])
-  
+```
+``` mermaid
 flowchart TD
   G[/qc_sidebar/] --> I{{qc_data}}
   H[/reset/] --> I
