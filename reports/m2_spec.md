@@ -39,10 +39,10 @@
 ### 3 Reactivity Diagram
 
 -   `[/Input/]` (Parallelogram) (or `[Input]` Rectangle) = reactive input
--   Hexagon `{{Name}}` = `@reactive.calc` expression
--   Stadium `([Name])` (or Circle) = rendered output
 
-Example:
+-   Hexagon `{{Name}}` = `@reactive.calc` expression
+
+-   Stadium `([Name])` (or Circle) = rendered output
 
 ``` mermaid
 flowchart TD
@@ -62,6 +62,7 @@ flowchart TD
   F --> P9([scatter_chart])
   F --> P10([get_iso3])
   
+flowchart TD
   G[/qc_sidebar/] --> I{{qc_data}}
   H[/reset/] --> I
   I --> J1([chat_df])
