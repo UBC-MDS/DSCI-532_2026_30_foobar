@@ -1,7 +1,7 @@
 ### 1 Updated Job Stories
 
 | \# | Job Story | Status | Notes |
-|--------------|------------------------|--------------|----------------------|
+|----------------|---------------------|----------------|-------------------|
 | 1 | When I am a wellness coordinator, I want to filter and compare addiction scores across demographic groups so I can identify which student populations are most at risk and prioritize them for targeted intervention. | ✅ Implemented |  |
 | 2 | When I am a wellness coordinator, I want to visualize the relationship between addiction scores and key outcome variables. In a single view I want to look at sleep duration, mental health scores, and academic performance so I can build a comprehensive case for why digital well-being programs. | ✅ Implemented |  |
 | 3 | When I am a wellness coordinator, I want to compare average addiction scores across different social media platforms so I can determine whether certain platforms warrant platform-specific awareness messaging in my campaigns. | ✅ Implemented |  |
@@ -10,7 +10,7 @@
 ### 2 Component Inventory
 
 | ID | Type | Shiny widget / renderer | Depends on | Job story |
-|--------------|--------------|---------------|------------------|--------------|
+|---------------|---------------|---------------|---------------|---------------|
 | `f_gender` | Input | `ui.input_radio_buttons()` | — | 1 |
 | `f_age` | Input | `ui.input_slider()` | — | 1 |
 | `f_academiclvl` | Input | `ui.input_select()` | — | 1 |
@@ -62,6 +62,7 @@ flowchart TD
   F --> P9([scatter_chart])
   F --> P10([get_iso3])
 ```
+
 ``` mermaid
 flowchart TD
   G[/qc_sidebar/] --> I{{qc_data}}
@@ -78,3 +79,5 @@ flowchart TD
 For each `@reactive.calc` in your diagram, briefly describe:
 
 `filered_df` depends on all five inputs (`f_gender`, `f_age`, `f_academiclvl`, `f_country`, `f_platform`). Then `@reactive.calc` dynamically filters rows based on the selected inputs the user provided with each input acts as an optional filter. For instance, `f_gender` and `f_academiclvl` inputs are provided, it filters rows based on the selected gender and academic level(s). All outputs consumes it and recompute in reponse to the changes in `filtered_df`.
+
+`qc_data` depends on both the chat box component `qc_sidebar` and the reset button `reset`. It contains the filtered data returned by querychat when the chat box executes a filter, and `reset` sets it to the full dataset. All outputs use it to display the data, and `download_csv` saves `qc_data` as a csv file named `social_media_data.csv`.
