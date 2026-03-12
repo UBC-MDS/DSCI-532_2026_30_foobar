@@ -24,7 +24,7 @@
 | `plot_AAP_bot` | Output | `@render_altair` | `qc_data` | 2 |
 | `plot_academiclvldist_bot` | Output | `@render_altair` | `qc_data` | 1 |
 | `scatter_chart_bot` | Output | `@render_altair` | `qc_data` | 2 |
-| `download_csv` | Input/Output | `@render.download` | `qc_data` | 1,2,3,4 |
+| `download_csv` | Output | `@render.download` | `qc_data` | 1,2,3,4 |
 | `plot_AAP` | Output | `@render_altair` | `filtered_df` | 2 |
 | `donut_academic_level` | Output | `@render_plotly` | `filtered_df` | 1 |
 | `plot_platformdist` | Output | `@render_altair` | `filtered_df` | 3 |
@@ -61,6 +61,14 @@ flowchart TD
   F --> P8([tile_addiction])
   F --> P9([scatter_chart])
   F --> P10([get_iso3])
+  
+  G[/qc_sidebar/] --> I{{qc_data}}
+  H[/reset/] --> I
+  I --> J1([chat_df])
+  I --> J2([plot_AAP_bot])
+  I --> J3([plot_academiclvldist_bot])
+  I --> J4([scatter_chart_bot])
+  I --> J5([download_csv])
 ```
 
 ### 4 Calculation Details
