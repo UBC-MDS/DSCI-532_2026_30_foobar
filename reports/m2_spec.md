@@ -5,7 +5,7 @@
 | 1 | When I am a wellness coordinator, I want to filter and compare addiction scores across demographic groups so I can identify which student populations are most at risk and prioritize them for targeted intervention. | ✅ Implemented |  |
 | 2 | When I am a wellness coordinator, I want to visualize the relationship between addiction scores and key outcome variables. In a single view I want to look at sleep duration, mental health scores, and academic performance so I can build a comprehensive case for why digital well-being programs. | ✅ Implemented |  |
 | 3 | When I am a wellness coordinator, I want to compare average addiction scores across different social media platforms so I can determine whether certain platforms warrant platform-specific awareness messaging in my campaigns. | ✅ Implemented |  |
-| 4 | When I am a wellness coordinator, I want to identify countries whose student populations show addiction profiles similar to my university’s so I can research the intervention strategies their universities are using and adapt best practices for my own institution. | ✅ Implemented |  |
+| 4 | When I am a wellness coordinator, I want to identify countries whose student populations show addiction profiles similar to my university’s so I can research the intervention strategies their universities are using and adapt best practices for my own institution. | ✅ Implemented (partial) | The functionality is implimented, but the data we currently have is not sufficient to achieve this goal.  |
 
 ### 2 Component Inventory
 
