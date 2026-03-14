@@ -430,6 +430,7 @@ def server(input, output, session):
 
         df_selected['iso_alpha'] = df_selected['Country'].apply(get_iso3)
         df_selected = df_selected.dropna(subset=['iso_alpha'])
+
         all_iso = [c.alpha_3 for c in pycountry.countries]
         no_data_iso = [iso for iso in all_iso if iso not in df_selected['iso_alpha'].values]
 
@@ -477,7 +478,19 @@ def server(input, output, session):
         fig.update_coloraxes(reversescale=True)
         #fig.add_trace(fig_unselected.data[0])
         fig.update_geos(fitbounds="locations", showframe=False)
-        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                          annotations = [
+                            dict(
+                                text = "⚠️ This dataset is small and not representative. <br> Student counts per country are minimal compared to actual populations — interpret with caution.",
+                                x=0.5,
+                                y=0.98,
+                                showarrow=False,
+                                font=dict(size=13),
+                                borderwidth=1,
+                                borderpad=6,
+                                align="left")
+                          ]
+                        )
         
         return fig
 
