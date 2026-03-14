@@ -27,3 +27,25 @@ bug, create an associated issue [here](https://github.com/UBC-MDS/DSCI-532_2026_
    
 ### Attribution
 These contributing guidelines were adapted from the [Breast Cancer Predictor Project Contributing Guidelines](https://github.com/tidyverse/dplyr/blob/master/.github/CONTRIBUTING.md), which was adapted from the the [dplyr contributing guidelines](https://github.com/tidyverse/dplyr/blob/master/.github/CONTRIBUTING.md).
+
+### Retrospective & Collaboration Norms
+
+#### Milestone 3 Retrospective
+**What worked**:
+- Individual feature delivery was consistent 
+- PR sizes were generally reasonable
+- Team discussions and coordination happened effectively through Slack
+- The delivered dashboard closely matched the initial sketch/design with minimal deviation
+- AI-powered tab was successfully implemented and functional as expected
+
+**What didn't work**:
+- PRs merged without at least one review approval
+- Branches occasionally drifted from main, accumulating unrelated commits
+- Feature branches were not deleted after merging to `main`
+
+#### Milestone 4 Collaboration Norms
+- No PR merges without at least one teammate review approval regardless of the number of LoC
+- Tag a specific reviewer when opening a PR
+- PR shouldn't be open and merge to `dev` for a long time to avoid dirty PRs
+- Delete feature branches after merging to `main`
+
