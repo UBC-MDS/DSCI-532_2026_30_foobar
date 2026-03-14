@@ -259,6 +259,12 @@ app_ui = ui.page_fluid(
                     ),
                     ui.card(
                         ui.card_header("Average Addiction Score by Country"),
+                        ui.HTML(
+                            "<p style='padding: 8px; border-radius: 4px; font-size: 0.85rem;'>"
+                            "⚠️ This dataset is small and not representative.<br>"
+                            "Student counts per country are minimal compared to actual populations — interpret with caution."
+                            "</p>"
+                        ),
                         output_widget("map_chart"),
                         full_screen=True,
                     ),
@@ -478,18 +484,7 @@ def server(input, output, session):
         fig.update_coloraxes(reversescale=True)
         #fig.add_trace(fig_unselected.data[0])
         fig.update_geos(fitbounds="locations", showframe=False)
-        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                          annotations = [
-                            dict(
-                                text = "⚠️ This dataset is small and not representative. <br> Student counts per country are minimal compared to actual populations — interpret with caution.",
-                                x=0.5,
-                                y=0.98,
-                                showarrow=False,
-                                font=dict(size=13),
-                                borderwidth=1,
-                                borderpad=6,
-                                align="left")
-                          ]
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}
                         )
         
         return fig
