@@ -32,6 +32,7 @@ These contributing guidelines were adapted from the [Breast Cancer Predictor Pro
 
 #### Milestone 3 Retrospective
 **What worked**:
+
 - Individual feature delivery was consistent 
 - PR sizes were generally reasonable
 - Team discussions and coordination happened effectively through Slack
@@ -39,6 +40,7 @@ These contributing guidelines were adapted from the [Breast Cancer Predictor Pro
 - AI-powered tab was successfully implemented and functional as expected
 
 **What didn't work**:
+
 - PRs merged without at least one review approval
 - Branches occasionally drifted from main, accumulating unrelated commits
 - Feature branches were not deleted after merging to `main`
