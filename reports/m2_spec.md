@@ -87,6 +87,6 @@ For each `@reactive.calc` in your diagram, briefly describe:
 A list of addressed feedbacks and a bief discription of each can be found below.
 - [CRITICAL] Filter combinations resulting in no results will result in empty plots, which might look like they are broken. They now have a fallback state stating there are no data avaliable.
 - [CRITICAL] The map highlight all countries as equals, while some countries have too few data to be representitive of the addition level of the country. We added a disclaimer stating due to the lack of data please interpret the map with caution.
-- [CRITICAL] Our current name for our conda environemnt (`532`) is too generic and may cause conflicts for other users. We renamed it to [TODO]
+- [CRITICAL] Our current name for our conda environemnt (`532`) is too generic and may cause conflicts for other users. We renamed it to `532-social-media-addiction` to be specific to our project.
 - [CRITICAL] Given the limited data some of our original job story are not really achieveable. We have changed the status of that job story to be partially compleated, adding a statement that while the functionality is implimented, we need more data to sufficiently support this task.
 - [Non-critical] Our `dev` branch allows merging without review, and the PRs are not linked to their respective issues. We have changed the branch protextion rules for the `dev` branch and we will keep this feedback in mind when proceeding to milestone 4.
