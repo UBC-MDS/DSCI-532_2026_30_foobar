@@ -57,7 +57,8 @@ _platforms  = sorted(students.select(_.Most_Used_Platform).distinct().execute()[
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
 greeting = "Hello! Welcome to your Social Media Addiction data dashboard. I'm here to help you filter, sort, and analyze the data."
-qc = QueryChat(df, "df", greeting=greeting, client="anthropic/claude-3-haiku-20240307")
+_df_for_qc = students.execute()
+qc = QueryChat(_df_for_qc, "df", greeting=greeting, client="anthropic/claude-3-haiku-20240307")
 
 
 # ── UI ───────────────────────────────────────────────────────────────
