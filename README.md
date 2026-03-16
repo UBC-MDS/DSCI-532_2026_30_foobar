@@ -22,7 +22,7 @@ Then install the development environment:
 
 ```bash
 conda env create -f environment.yml
-conda activate 532
+conda activate 532-social-media-addiction
 ```
 
 Run the below command to download the dataset:
