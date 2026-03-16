@@ -11,6 +11,8 @@ import pandas as pd
 import plotly.express as px
 import pycountry
 import altair as alt
+import ibis
+from ibis import _
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, render_altair, output_widget
 from pathlib import Path
@@ -23,28 +25,29 @@ import plotly.graph_objects as go
 # Build a robust path (works locally + on Connect Cloud)
 HERE = Path(__file__).resolve().parent        # src/
 ROOT = HERE.parent                           # project root
-DATA_PATH = ROOT / "data" / "raw" / "Students-Social-Media-Addiction.csv"
+DATA_PATH = ROOT / "data" / "processed" / "Students-Social-Media-Addiction.parquet"
 
 if not DATA_PATH.exists():
     raise FileNotFoundError(
-        f"Dataset not found at {DATA_PATH}. "
-        "Make sure the CSV is committed inside data/raw/."
+        f"Parquet file not found at {DATA_PATH}. "
+        "Run prep_data.py first to convert the CSV to parquet."
     )
 
-df = pd.read_csv(DATA_PATH)
+# ── ibis + DuckDB connection (lazy — no data loaded yet) ──────────────
+con = ibis.duckdb.connect()
+students = con.read_parquet(str(DATA_PATH))
 
+_meta = students.aggregate(
+    age_min=_.Age.min(),
+    age_max=_.Age.max(),
+    score_min=_.Addicted_Score.min(),
+    score_max=_.Addicted_Score.max(),
+).execute().iloc[0]
 
-AGE_MIN = int(df["Age"].min())
-AGE_MAX = int(df["Age"].max())
-
-#df_all_country = df.groupby("Country", as_index=False).agg({
-#    "Student_ID": "count",
-#    "Avg_Daily_Usage_Hours": "mean",
-#    "Sleep_Hours_Per_Night": "mean",
-#    "Addicted_Score": "mean",
-#})
-MIN_SCORE = df["Addicted_Score"].min()
-MAX_SCORE = df["Addicted_Score"].max()
+AGE_MIN   = int(_meta["age_min"])
+AGE_MAX   = int(_meta["age_max"])
+MIN_SCORE = float(_meta["score_min"])
+MAX_SCORE = float(_meta["score_max"])
 
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
