@@ -357,7 +357,8 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
 
-    session.on_ended(con.disconnect)
+    # Close the DuckDB connection when the user's browser session ends (prevents resource leaks on the server)
+    # session.on_ended(con.disconnect)
 
     qc_data = qc.server()
 
