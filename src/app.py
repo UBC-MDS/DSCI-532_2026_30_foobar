@@ -101,7 +101,7 @@ body {
     overflow: hidden !important;
 }
 .tab-pane[data-value="Chatbot"] .bslib-sidebar-layout > .main {
-    overflow-y: auto !important;
+    overflow-y: auto !important;git ad
     height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
@@ -354,25 +354,24 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered_df():
-        data = df.copy()
-        data = data[data["Academic_Level"].isin(["Undergraduate", "Graduate"])]
+        expr = students.filter(_.Academic_Level.isin(["Undergraduate", "Graduate"]))
 
         if input.f_gender() != "All":
-            data = data[data["Gender"] == input.f_gender()]
+            expr = expr.filter(_.Gender == input.f_gender())
 
         age_low, age_high = input.f_age()
-        data = data[(data["Age"] >= age_low) & (data["Age"] <= age_high)]
+        expr = expr.filter(_.Age.between(age_low, age_high))
 
         if input.f_level() != "All":
-            data = data[data["Academic_Level"] == input.f_level()]
+            expr = expr.filter(_.Academic_Level == input.f_level())
 
-        if input.f_country():  # empty tuple means "all countries"
-            data = data[data["Country"].isin(input.f_country())]
+        if input.f_country():
+            expr = expr.filter(_.Country.isin(list(input.f_country())))
 
         if input.f_platform():
-            data = data[data["Most_Used_Platform"].isin(input.f_platform())]
+            expr = expr.filter(_.Most_Used_Platform.isin(list(input.f_platform())))
 
-        return data
+        return expr.execute()
 
 
     # ── Stat tiles ────────────────────────────────────────────────────
