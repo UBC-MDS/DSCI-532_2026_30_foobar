@@ -12,7 +12,6 @@ import plotly.express as px
 import pycountry
 import altair as alt
 import ibis
-from ibis import _
 from shiny import App, render, ui, reactive
 from shinywidgets import render_plotly, render_altair, output_widget
 from pathlib import Path
@@ -24,7 +23,7 @@ import plotly.graph_objects as go
 
 # Build a robust path (works locally + on Connect Cloud)
 HERE = Path(__file__).resolve().parent        # src/
-ROOT = HERE.parent                           # project root
+ROOT = HERE.parent                            # project root
 DATA_PATH = ROOT / "data" / "processed" / "Students-Social-Media-Addiction.parquet"
 
 if not DATA_PATH.exists():
@@ -37,13 +36,13 @@ if not DATA_PATH.exists():
 con = ibis.duckdb.connect()
 students = con.read_parquet(str(DATA_PATH))
 
-#One-time helper queries for filter components
-
+# ── One-time helper queries for filter components ─────────────────────
+# Single aggregation query — pulls min/max values for slider bounds
 _meta = students.aggregate(
-    age_min=_.Age.min(),
-    age_max=_.Age.max(),
-    score_min=_.Addicted_Score.min(),
-    score_max=_.Addicted_Score.max(),
+    age_min=students.Age.min(),
+    age_max=students.Age.max(),
+    score_min=students.Addicted_Score.min(),
+    score_max=students.Addicted_Score.max(),
 ).execute().iloc[0]
 
 AGE_MIN   = int(_meta["age_min"])
@@ -51,8 +50,9 @@ AGE_MAX   = int(_meta["age_max"])
 MIN_SCORE = float(_meta["score_min"])
 MAX_SCORE = float(_meta["score_max"])
 
-_countries  = sorted(students.select(_.Country).distinct().execute()["Country"].tolist())
-_platforms  = sorted(students.select(_.Most_Used_Platform).distinct().execute()["Most_Used_Platform"].tolist())
+# Distinct values for sidebar dropdowns — queried once at startup
+_countries = sorted(students.select(students.Country).distinct().execute()["Country"].tolist())
+_platforms = sorted(students.select(students.Most_Used_Platform).distinct().execute()["Most_Used_Platform"].tolist())
 
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
@@ -283,15 +283,6 @@ app_ui = ui.page_fluid(
         ui.nav_panel("Chatbot",
             ui.layout_sidebar(
 
-                # ── SIDEBAR: filters go here ──────────────────────────────────
-                #ui.sidebar(
-
-                #    ui.h6("Chat box here"),
-
-                #    open="desktop",
-                #    bg = "#EEF1F6",
-                #    fg = "#0F1F3D",
-                #),
                 qc.sidebar(
                     open="desktop",
                     bg = "#EEF1F6",
@@ -301,17 +292,13 @@ app_ui = ui.page_fluid(
                     ui.input_action_button("reset", "Reset Filters"),
                     ui.download_button("download_csv", "Download CSV")
                 ),
-                
 
                 # ── MAIN AREA ─────────────────────────────────────────────────
-                # Row 1: Summary stat tiles
                 ui.card(
                     ui.card_header("Filtered Data"),
                     ui.output_data_frame("chat_df"),
-                    
                 ),
 
-                # Row 2: Four chart placeholders in a 2x2 grid
                 ui.layout_columns(
                     ui.card(
                         ui.card_header("Impact on Academic Performance"),
@@ -324,14 +311,12 @@ app_ui = ui.page_fluid(
                         output_widget("plot_academiclvldist_bot"),
                         full_screen=True,
                     ),
-                    
-                    #col_widths=[3, 3, 6],
                 ),
                 ui.card(
-                        ui.card_header("Addiction vs Mental Health & Sleep"),
-                        output_widget("scatter_chart_bot"),
-                        full_screen=True,
-                    ),
+                    ui.card_header("Addiction vs Mental Health & Sleep"),
+                    output_widget("scatter_chart_bot"),
+                    full_screen=True,
+                ),
 
             )
         )
@@ -341,7 +326,10 @@ app_ui = ui.page_fluid(
 # ── SERVER ───────────────────────────────────────────────────────────
 
 def server(input, output, session):
+
+    # Close the DuckDB connection when the user's browser session ends (prevents resource leaks on the server)
     session.on_ended(con.disconnect)
+
     qc_data = qc.server()
 
     custom_ui_scale = alt.Scale(
@@ -349,29 +337,30 @@ def server(input, output, session):
         type='linear'
     )
 
-    
-
     # ── Filtered data ─────────────────────────────────────────────────
+    # Builds an ibis expression chain and executes once per input change.
+    # All filtering happens in DuckDB before any data enters RAM.
 
     @reactive.calc
     def filtered_df():
-        expr = students.filter(_.Academic_Level.isin(["Undergraduate", "Graduate"]))
+        expr = students.filter(students.Academic_Level.isin(["Undergraduate", "Graduate"]))
 
         if input.f_gender() != "All":
-            expr = expr.filter(_.Gender == input.f_gender())
+            expr = expr.filter(expr.Gender == input.f_gender())
 
         age_low, age_high = input.f_age()
-        expr = expr.filter(_.Age.between(age_low, age_high))
+        expr = expr.filter(expr.Age.between(age_low, age_high))
 
         if input.f_level() != "All":
-            expr = expr.filter(_.Academic_Level == input.f_level())
+            expr = expr.filter(expr.Academic_Level == input.f_level())
 
         if input.f_country():
-            expr = expr.filter(_.Country.isin(list(input.f_country())))
+            expr = expr.filter(expr.Country.isin(list(input.f_country())))
 
         if input.f_platform():
-            expr = expr.filter(_.Most_Used_Platform.isin(list(input.f_platform())))
+            expr = expr.filter(expr.Most_Used_Platform.isin(list(input.f_platform())))
 
+        # .execute() sends the query to DuckDB — only matching rows enter RAM
         return expr.execute()
 
 
@@ -416,7 +405,7 @@ def server(input, output, session):
             color=alt.Color(
                 "Sleep_Hours_Per_Night", 
                 title="Sleep Time (hrs)", 
-                scale=custom_ui_scale#alt.Scale(scheme="viridis")
+                scale=custom_ui_scale
             ),
             tooltip=["Addicted_Score", "Mental_Health_Score", "Sleep_Hours_Per_Night"]
         ).interactive()
@@ -457,7 +446,7 @@ def server(input, output, session):
                 [0.0, '#0F1F3D'],
                 [0.3, '#517BD6'],
                 [1.0, '#26f7fd']
-            ],#'viridis',
+            ],
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name='Country',
             labels={
@@ -490,14 +479,13 @@ def server(input, output, session):
         fig.data = fig.data[::-1]
 
         fig.update_coloraxes(reversescale=True)
-        #fig.add_trace(fig_unselected.data[0])
         fig.update_geos(fitbounds="locations", showframe=False)
-        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0}
-                        )
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         
         return fig
 
-    # ── Chart 1: Does social media affect academic performance? ─────────────────────────
+    # ── Chart 1: Does social media affect academic performance? ───────
+
     @render_altair
     def plot_AAP():
         df1 = filtered_df()
@@ -505,7 +493,6 @@ def server(input, output, session):
         percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
         percent["label"] = percent["Percentage"].astype(str) + "%"
-
 
         chart = alt.Chart(percent).mark_bar().encode(
             alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
@@ -577,7 +564,8 @@ def server(input, output, session):
 
         return fig
 
-    # ── Chart 3: Academic Level Distribution ───────────────────────────────────
+    # ── Chart 3: Academic Level Distribution ─────────────────────────
+
     @render_altair
     def plot_academiclvldist():
         df = filtered_df()
@@ -608,6 +596,7 @@ def server(input, output, session):
         return chart
 
     # ── Chart 4: Platform Distribution ───────────────────────────────
+
     @render_plotly
     def sunburst_platform():
         d = filtered_df()
@@ -650,7 +639,6 @@ def server(input, output, session):
         total = int(platform_counts["Count"].sum())
         platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).astype(str) + "%"
 
-
         fig = px.sunburst(
             platform_counts,
             path=["Gender","Platform_Group"],
@@ -672,8 +660,9 @@ def server(input, output, session):
         fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
     
         return fig
-        
-#####
+
+    # ── Chatbot tab ───────────────────────────────────────────────────
+
     @render.data_frame
     def chat_df():
         return qc_data.df()
@@ -696,7 +685,6 @@ def server(input, output, session):
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
         percent["label"] = percent["Percentage"].astype(str) + "%"
 
-
         chart = alt.Chart(percent).mark_bar().encode(
             alt.Y("Affects_Academic_Performance:N", title = "Impact on Academic Performance"),
             alt.X("Percentage:Q", title = "Percentage of Students"),
@@ -710,7 +698,8 @@ def server(input, output, session):
 
         return chart + chart.mark_text(align = "left").encode(text = alt.Text("label:N"), color=alt.value('black'))
 
-    # ── Chart 3: Academic Level Distribution ───────────────────────────────────
+    # ── Chart 3: Academic Level Distribution ─────────────────────────
+
     @render_altair
     def plot_academiclvldist_bot():
         df = qc_data.df()
@@ -760,14 +749,12 @@ def server(input, output, session):
             color=alt.Color(
                 "Sleep_Hours_Per_Night", 
                 title="Sleep Time (hrs)", 
-                scale=custom_ui_scale#alt.Scale(scheme="viridis")
+                scale=custom_ui_scale
             ),
             tooltip=["Addicted_Score", "Mental_Health_Score", "Sleep_Hours_Per_Night"]
         ).interactive()
         
         return fig
-        
-    
 
 
 # ── APP ───────────────────────────────────────────────────────────────
