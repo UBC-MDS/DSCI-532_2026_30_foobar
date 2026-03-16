@@ -340,7 +340,7 @@ app_ui = ui.page_fluid(
 # ── SERVER ───────────────────────────────────────────────────────────
 
 def server(input, output, session):
-
+    session.on_ended(con.disconnect)
     qc_data = qc.server()
 
     custom_ui_scale = alt.Scale(
