@@ -21,3 +21,4 @@ dependencies:
     - vl-convert-python
     - querychat
     - anthropic
+    - ibis-framework[duckdb]
