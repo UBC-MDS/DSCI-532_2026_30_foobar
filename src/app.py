@@ -37,6 +37,8 @@ if not DATA_PATH.exists():
 con = ibis.duckdb.connect()
 students = con.read_parquet(str(DATA_PATH))
 
+#One-time helper queries for filter components
+
 _meta = students.aggregate(
     age_min=_.Age.min(),
     age_max=_.Age.max(),
@@ -48,6 +50,9 @@ AGE_MIN   = int(_meta["age_min"])
 AGE_MAX   = int(_meta["age_max"])
 MIN_SCORE = float(_meta["score_min"])
 MAX_SCORE = float(_meta["score_max"])
+
+_countries  = sorted(students.select(_.Country).distinct().execute()["Country"].tolist())
+_platforms  = sorted(students.select(_.Most_Used_Platform).distinct().execute()["Most_Used_Platform"].tolist())
 
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
@@ -183,7 +188,7 @@ app_ui = ui.page_fluid(
                     ui.input_selectize(
                         id="f_country",
                         label="Country",
-                        choices=sorted(df["Country"].unique().tolist()),
+                        choices=_countries,
                         multiple=True,
                     ),
 
@@ -191,7 +196,7 @@ app_ui = ui.page_fluid(
                     ui.input_selectize(
                         id="f_platform",
                         label="Social Media Platform",
-                        choices=sorted(df["Most_Used_Platform"].unique().tolist()),
+                        choices=_platforms,
                         multiple=True,
                     ),
 
