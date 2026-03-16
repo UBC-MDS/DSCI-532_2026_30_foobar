@@ -474,11 +474,24 @@ def server(input, output, session):
             except Exception:
                 return None
 
+        def iso3_to_country(iso3_code):
+            try:
+                return pycountry.countries.get(alpha_3=iso3_code).name
+            except Exception:
+                return iso3_code
+
+        # Countries that DO have data
         df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
         df_selected = df_selected.dropna(subset=["iso_alpha"])
 
+        # Countries that DO NOT have data
         all_iso = [c.alpha_3 for c in pycountry.countries]
         no_data_iso = [iso for iso in all_iso if iso not in df_selected["iso_alpha"].values]
+
+        no_data_df = pd.DataFrame({
+            "iso_alpha": no_data_iso,
+            "Country": [iso3_to_country(iso) for iso in no_data_iso]
+        })
 
         fig = px.choropleth(
             df_selected,
@@ -509,19 +522,21 @@ def server(input, output, session):
             },
         )
 
+        # Grey layer for countries without data
         fig.add_trace(
             go.Choropleth(
-                locations=no_data_iso,
-                z=[0] * len(no_data_iso),
+                locations=no_data_df["iso_alpha"],
+                z=[0] * len(no_data_df),
                 locationmode="ISO-3",
+                customdata=no_data_df[["Country"]].values,
                 colorscale=[[0, "#d3d3d3"], [1, "#d3d3d3"]],
                 showscale=False,
                 marker=dict(line=dict(color="black", width=0.5)),
-                hovertemplate="<b>%{location}</b><br>No data available<extra></extra>",
+                hovertemplate="<b>%{customdata[0]}</b><br>No data available<extra></extra>",
             )
         )
 
-        # Put the grey no-data layer below the real data layer
+        # Put grey no-data layer below colored data layer
         fig.data = fig.data[::-1]
 
         fig.update_coloraxes(reversescale=True)
@@ -534,19 +549,16 @@ def server(input, output, session):
             if not points.point_inds:
                 return
 
-            # Ignore grey no-data layer because it has no customdata
-            if getattr(trace, "customdata", None) is None:
-                return
-
             idx = points.point_inds[0]
-            country = trace.customdata[idx][0]
-            selected_country_map.set(country)
+
+            if getattr(trace, "customdata", None) is not None:
+                country = trace.customdata[idx][0]
+                selected_country_map.set(country)
 
         for trace in widget.data:
             trace.on_click(handle_click)
 
         return widget
-
     # ── Chart 1: Impact on academic performance ──────────────────────
     @render_altair
     def plot_AAP():
