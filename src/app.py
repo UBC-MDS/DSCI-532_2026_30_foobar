@@ -102,7 +102,7 @@ body {
     overflow: hidden !important;
 }
 .tab-pane[data-value="Chatbot"] .bslib-sidebar-layout > .main {
-    overflow-y: auto !important;git ad
+    overflow-y: auto !important;
     height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
