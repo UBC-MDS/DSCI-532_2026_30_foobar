@@ -56,6 +56,12 @@ _platforms = sorted(
     students.select(students.Most_Used_Platform).distinct().execute()["Most_Used_Platform"].tolist()
 )
 
+def get_iso3(country_name):
+    try:
+        return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
+    except Exception:
+        return None
+
 # ── LLM setup ────────────────────────────────────────────────────────
 load_dotenv()
 greeting = "Hello! Welcome to your Social Media Addiction data dashboard. I'm here to help you filter, sort, and analyze the data."
@@ -389,20 +395,29 @@ def server(input, output, session):
         if input.f_platform():
             expr = expr.filter(expr.Most_Used_Platform.isin(list(input.f_platform())))
 
-        # Filter by clicked country from the map
-        clicked_country = selected_country_map.get()
-        if clicked_country is not None:
-            expr = expr.filter(expr.Country == clicked_country)
+        df = expr.execute().copy()
 
-        return expr.execute()
+        # Filter by clicked country from the map using ISO-3
+        clicked_iso = selected_country_map.get()
+        if clicked_iso is not None:
+            df["iso_alpha"] = df["Country"].apply(get_iso3)
+            df = df[df["iso_alpha"] == clicked_iso]
+
+        return df
 
     # ── Clicked country display ──────────────────────────────────────
     @render.text
     def selected_country_text():
-        clicked_country = selected_country_map.get()
-        if clicked_country is None:
+        clicked_iso = selected_country_map.get()
+        if clicked_iso is None:
             return "Clicked country filter: None"
-        return f"Clicked country filter: {clicked_country}"
+
+        try:
+            country_name = pycountry.countries.get(alpha_3=clicked_iso).name
+        except Exception:
+            country_name = clicked_iso
+
+        return f"Clicked country filter: {country_name}"
 
     @reactive.effect
     @reactive.event(input.clear_map_country)
@@ -459,7 +474,26 @@ def server(input, output, session):
     # ── Map with click interaction ───────────────────────────────────
     @render_plotly
     def map_chart():
-        d = filtered_df().copy()
+        # Build the map from sidebar filters only,
+        # not from the already clicked-country filtered data
+        expr = students.filter(students.Academic_Level.isin(["Undergraduate", "Graduate"]))
+
+        if input.f_gender() != "All":
+            expr = expr.filter(expr.Gender == input.f_gender())
+
+        age_low, age_high = input.f_age()
+        expr = expr.filter(expr.Age.between(age_low, age_high))
+
+        if input.f_level() != "All":
+            expr = expr.filter(expr.Academic_Level == input.f_level())
+
+        if input.f_country():
+            expr = expr.filter(expr.Country.isin(list(input.f_country())))
+
+        if input.f_platform():
+            expr = expr.filter(expr.Most_Used_Platform.isin(list(input.f_platform())))
+
+        d = expr.execute().copy()
 
         df_selected = d.groupby("Country", as_index=False).agg({
             "Student_ID": "count",
@@ -468,29 +502,15 @@ def server(input, output, session):
             "Addicted_Score": "mean",
         })
 
-        def get_iso3(country_name):
-            try:
-                return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
-            except Exception:
-                return None
-
-        def iso3_to_country(iso3_code):
-            try:
-                return pycountry.countries.get(alpha_3=iso3_code).name
-            except Exception:
-                return iso3_code
-
-        # Countries that DO have data
         df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
         df_selected = df_selected.dropna(subset=["iso_alpha"])
 
-        # Countries that DO NOT have data
         all_iso = [c.alpha_3 for c in pycountry.countries]
-        no_data_iso = [iso for iso in all_iso if iso not in df_selected["iso_alpha"].values]
+        data_iso = set(df_selected["iso_alpha"].tolist())
+        no_data_iso = [iso for iso in all_iso if iso not in data_iso]
 
         no_data_df = pd.DataFrame({
-            "iso_alpha": no_data_iso,
-            "Country": [iso3_to_country(iso) for iso in no_data_iso]
+            "iso_alpha": no_data_iso
         })
 
         fig = px.choropleth(
@@ -505,7 +525,7 @@ def server(input, output, session):
             ],
             range_color=[MIN_SCORE, MAX_SCORE],
             hover_name="Country",
-            custom_data=["Country"],
+            custom_data=["iso_alpha", "Country"],
             labels={
                 "Student_ID": "Total Students",
                 "Avg_Daily_Usage_Hours": "Avg Daily Usage (hrs)",
@@ -522,17 +542,16 @@ def server(input, output, session):
             },
         )
 
-        # Grey layer for countries without data
         fig.add_trace(
             go.Choropleth(
                 locations=no_data_df["iso_alpha"],
                 z=[0] * len(no_data_df),
                 locationmode="ISO-3",
-                customdata=no_data_df[["Country"]].values,
+                customdata=no_data_df[["iso_alpha"]].values,
                 colorscale=[[0, "#d3d3d3"], [1, "#d3d3d3"]],
                 showscale=False,
                 marker=dict(line=dict(color="black", width=0.5)),
-                hovertemplate="<b>%{customdata[0]}</b><br>No data available<extra></extra>",
+                hovertemplate="<b>%{location}</b><br>No data available<extra></extra>",
             )
         )
 
@@ -550,10 +569,17 @@ def server(input, output, session):
                 return
 
             idx = points.point_inds[0]
+            custom = getattr(trace, "customdata", None)
+            if custom is None:
+                return
 
-            if getattr(trace, "customdata", None) is not None:
-                country = trace.customdata[idx][0]
-                selected_country_map.set(country)
+            clicked_iso = custom[idx][0]
+
+            # toggle behavior: click same country again to clear
+            if selected_country_map.get() == clicked_iso:
+                selected_country_map.set(None)
+            else:
+                selected_country_map.set(clicked_iso)
 
         for trace in widget.data:
             trace.on_click(handle_click)
