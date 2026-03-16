@@ -34,7 +34,7 @@
 | `tile_sleep` | Output | `@render_altair` | `filtered_df` | 2 |
 | `tile_addiction` | Output | `@render_altair` | `filtered_df` | 1,2,3,4 |
 | `scatter_chart` | Output | `@render_altair` | `filtered_df` | 2 |
-| `get_iso3` | Output | `@render_plotly` | `filtered_df` | 4 |
+| `map_chart` | Input/Output | `@render_plotly` | `filtered_df` | 4 |
 
 ### 3 Reactivity Diagram
 
@@ -51,6 +51,7 @@ flowchart TD
   C[/f_academiclvl/] --> F
   D[/f_country/] --> F
   E[/f_platform/] --> F
+  P10i[/map_chart/] --> F
   F --> P1([plot_AAP])
   F --> P2([donut_academic_level])
   F --> P3([plot_platformdist])
@@ -60,7 +61,7 @@ flowchart TD
   F --> P7([tile_sleep])
   F --> P8([tile_addiction])
   F --> P9([scatter_chart])
-  F --> P10([get_iso3])
+  F --> P10([map_chart])
 ```
 
 ``` mermaid
