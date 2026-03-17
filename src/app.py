@@ -374,6 +374,21 @@ def server(input, output, session):
         type='linear'
     )
 
+    def no_data_chart(height=300):
+        return (
+            alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]}))
+            .mark_text(size=20, color="gray")
+            .encode(
+                x=alt.X("x:Q", axis=None, scale=alt.Scale(domain=[0, 1])),
+                y=alt.Y("y:Q", axis=None, scale=alt.Scale(domain=[0, 1])),
+                text="text:N",
+            )
+            .properties(width="container", height=height)
+            .configure_view(strokeWidth=0, fill="#F4F6F9")
+            .configure_axis(grid=False)
+        )
+    
+
     # ── Filtered data ────────────────────────────────────────────────
     @reactive.calc
     def filtered_df():
@@ -427,7 +442,7 @@ def server(input, output, session):
     def scatter_chart():
         d = filtered_df()
         if d.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
+            return no_data_chart(height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
@@ -553,7 +568,7 @@ def server(input, output, session):
     def plot_AAP():
         df1 = filtered_df()
         if df1.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
+            return no_data_chart(height=200)
         #calculate the percentage
         percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
@@ -642,7 +657,7 @@ def server(input, output, session):
     def plot_academiclvldist():
         df = filtered_df()
         if df.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
+            return no_data_chart(height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -738,7 +753,7 @@ def server(input, output, session):
     def plot_AAP_bot():
         df1 = qc_data.df()
         if df1.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
+            return no_data_chart(height=200)
         #calculate the percentage
         percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
@@ -768,7 +783,7 @@ def server(input, output, session):
     def plot_academiclvldist_bot():
         df = qc_data.df()
         if df.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
+            return no_data_chart(height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -799,7 +814,7 @@ def server(input, output, session):
     def scatter_chart_bot():
         d = qc_data.df()
         if d.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
+            return no_data_chart(height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
