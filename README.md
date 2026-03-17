@@ -8,7 +8,7 @@ The dashboard is intended for school administrators, counselors, and students se
 
 ### Demo
 
-![Dashboard Demo](img/demo.gif)
+![Dashboard Demo](img/m4demo.gif)
 
 ### Setup (for contributors)
 First, clone the repository and navigate into the project directory:
