@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 - Updated App Specification to reflect AI implementation from M3 and added advanced feature from M4 [PR](https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction/pull/76)
 - Updated via contributing.md with the M3 retrospective and established M4 collaboration norms [issue](https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction/issues/65), [PR](https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction/pull/71)
 - Updated the conda environment name from 532 to 532-social-media-addiction to avoid local naming conflicts [PR](https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction/pull/79)
-- Updated "No data available" messaging for all charts to handle empty filter combinations [PR]()
+- Updated "No data available" messaging for all charts to handle empty filter combinations [PR](https://github.com/UBC-MDS/DSCI-532_2026_30_social-media-addiction/pull/84)
 
 ### Fixed
 
