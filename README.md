@@ -8,7 +8,7 @@ The dashboard is intended for school administrators, counselors, and students se
 
 ### Demo
 
-![Dashboard Demo](img/demo.gif)
+![Dashboard Demo](img/m4demo.gif)
 
 ### Setup (for contributors)
 First, clone the repository and navigate into the project directory:
@@ -22,7 +22,7 @@ Then install the development environment:
 
 ```bash
 conda env create -f environment.yml
-conda activate 532
+conda activate 532-social-media-addiction
 ```
 
 Run the below command to download the dataset:
@@ -30,10 +30,9 @@ Run the below command to download the dataset:
 ```bash
 python src/download_data.py
 ```
-To run the shiny app locally, navigate and run shiny with the following command:
+To run the shiny app locally, navigate to the project root directory and run shiny with the following command:
 ```bash
-cd src/
-shiny run app.py
+shiny run src/app.py
 ```
 You will be able to access the app at the link displayed in the command line.
 
@@ -44,6 +43,71 @@ https://019ca108-2c5a-f4a9-1093-cdd4a540d77d.share.connect.posit.cloud/
 
 #### Preview (dev): 
 https://019ca127-fdc0-0c6d-1031-e1462c7abb05.share.connect.posit.cloud/
+
+## Running Tests
+
+This project includes both:
+
+- **Unit tests** for core dashboard logic in `src/logic.py`
+- **Playwright end-to-end tests** for key dashboard interactions in the running Shiny app
+
+All tests can be executed with a single command.
+
+---
+
+## Activate the project environment if not yet activated
+
+```bash
+conda activate 532-social-media-addiction
+```
+
+## Install testing dependencies
+
+If the testing libraries are not already installed, run:
+
+```bash
+python -m pip install pytest pytest-playwright playwright
+```
+
+## Install Playwright browser binaries
+
+Playwright requires browser binaries. Install them once per environment:
+```bash
+python -m playwright install
+```
+
+Run all tests (single command)
+
+From the project root directory, run:
+
+```bash
+PYTHONPATH=. shiny run src/app.py
+```
+```bash
+PYTHONPATH=. pytest -q
+```
+This command runs both:
+
+- unit tests (tests/test_logic.py)
+- Playwright UI tests (tests/test_dashboard_playwright.py)
+
+
+## Optional: Run specific test groups
+Run only unit tests
+```bash
+PYTHONPATH=. pytest tests/test_logic.py -q
+```
+Run only Playwright end-to-end tests
+
+```bash
+PYTHONPATH=. pytest tests/test_dashboard_playwright.py -q
+```
+
+## Notes
+- Tests must be executed from the project root directory.
+- The PYTHONPATH=. prefix allows Python to import modules from the src folder.
+- The file src/__init__.py ensures the src directory is treated as a Python package.
+
 
 ### Contributing
 

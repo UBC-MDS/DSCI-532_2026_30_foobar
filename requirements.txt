@@ -7,6 +7,7 @@ vegafusion>=2.0.3
 vl-convert-python
 vega-datasets
 pandas>=2.0
+ibis-framework[duckdb]
 geopandas
 dash>=2.18.1
 geoarrow-pandas
@@ -16,10 +17,12 @@ plotly>=5.24.1
 anywidget>=0.9.13
 pycountry>=22.3.5
 seaborn
+pytest
+playwright
+pytest-playwright
 matplotlib
 python-dotenv>=1.0.1
 querychat @ git+https://github.com/posit-dev/querychat
 chatlas[anthropic]
 # Temporary workaround so connect cloud will pick up latest version
 httpcore>=1.0.8
-
