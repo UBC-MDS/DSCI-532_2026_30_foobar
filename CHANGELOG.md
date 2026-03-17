@@ -52,7 +52,7 @@ We implemented an interactive map that allows users to filter the country by cli
 ### **Test Plan**
 
 Test Function | Test Type | Behaviour verified | What breaks if it changes |
-|------|------|--------|-------------------|--------------------------|
+|------|--------|-------------------|--------------------------|
 | `test_apply_dashboard_filters_combines_sidebar_filters_correctly` | unit test | Multiple sidebar filters correctly narrow the dataset | Dashboard may show incorrect subsets of students |
 | `test_apply_dashboard_filters_clicked_country_overrides_to_single_country` | unit test | Clicking a country on the map correctly filters the dataset| Map interaction stops affecting dashboard results|
 | `test_summarize_country_metrics_returns_expected_counts_and_means` | unit test | Country-level aggregation produces correct counts and averages |Choropleth map statistics become incorrect |
