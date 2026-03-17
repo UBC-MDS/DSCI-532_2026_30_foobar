@@ -703,6 +703,8 @@ def server(input, output, session):
     @render_altair
     def plot_AAP_bot():
         df1 = qc_data.df()
+        if df1.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
         #calculate the percentage
         percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
@@ -726,6 +728,8 @@ def server(input, output, session):
     @render_altair
     def plot_academiclvldist_bot():
         df = qc_data.df()
+        if df.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -755,6 +759,8 @@ def server(input, output, session):
     @render_altair
     def scatter_chart_bot():
         d = qc_data.df()
+        if d.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
