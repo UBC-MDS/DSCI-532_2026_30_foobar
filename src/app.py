@@ -7,7 +7,7 @@ Open:     http://127.0.0.1:8000
 
 # ── IMPORTS ───────────────────────────────────────────────────────────
 
-from src.logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
+from logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
 import pandas as pd
 import plotly.express as px
 import pycountry
@@ -678,12 +678,9 @@ def server(input, output, session):
             fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
             fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
             return fig
-        platform_counts = (
-            d.groupby(["Gender", "Most_Used_Platform"])
-            .agg(Count=("Gender", "size"))
-            .reset_index()
-        )
 
+        platform_counts = group_platforms_for_sunburst(d)
+        
         color_map = {"Facebook":  "#1e3a6e",
                     "Instagram": "#2d6be4",
                     "KakaoTalk": "#5ba4cf",
@@ -697,10 +694,9 @@ def server(input, output, session):
                     "WhatsApp":  "#d0dff0",
                     "YouTube":   "#bfd4e8",
                     "Other":     "#4a5a6e",
-                    "Female":    "#5ba4cf", 
+                    "Female":    "#5ba4cf",
                     "Male":      "#1e3a6e",
                 }
-        
 
         fig = px.sunburst(
             platform_counts,
@@ -708,7 +704,6 @@ def server(input, output, session):
             values="Count",
             color="Platform_Group",
             color_discrete_map=color_map,
-            custom_data=["Percentage"],
         )
 
         fig.update_traces(

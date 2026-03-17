@@ -4,13 +4,13 @@ import time
 import pytest
 
 
-APP_URL = "http://127.0.0.1:8008"
+APP_URL = "http://127.0.0.1:8000"
 
 
 @pytest.fixture(scope="session", autouse=True)
 def shiny_app():
     proc = subprocess.Popen(
-        ["shiny", "run", "--port", "8008", "src/app.py"],
+        ["shiny", "run", "--port", "8000", "src/app.py"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -19,6 +19,10 @@ def shiny_app():
     yield
     proc.terminate()
     proc.wait(timeout=10)
+    print("\n--- SHINY STDOUT ---")
+    print(proc.stdout.read())
+    print("--- SHINY STDERR ---")
+    print(proc.stderr.read())
 
 
 def wait_for_non_empty_text(locator, page, timeout_ms=10000):
