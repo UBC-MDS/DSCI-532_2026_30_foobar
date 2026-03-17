@@ -49,9 +49,7 @@ We implemented an interactive map that allows users to filter the country by cli
 - **M3 retrospective:** PRs were occasionally merged without review approval, feature branches were not consistently deleted after merging, and branched sometimes drifted from main branch with unrelated commits accumulated over time. These gaps made codebase harder to manage cleanly,
 - **M4:** We aimed to improve our workflow by adding branch protection rule so no PR merges without at least one teammate review approval regardless of the size of LoC. We start to tag specific reviewer(s) when opening PRs and tried avoid PRs to stay open for too long to prevent dirty merges. Cleaned up unused branch other they are merged to main.
 
-### Reflection
-
-#### **Test Plan**
+### **Test Plan**
 
 Test Function | Test Type | Behaviour verified | What breaks if it changes |
 |------|------|--------|-------------------|--------------------------|
@@ -66,6 +64,7 @@ Test Function | Test Type | Behaviour verified | What breaks if it changes |
 | `test_country_filter_changes_total_students_tile` | Playwright end-to-end tests |Selecting a country updates dashboard totals | Country filtering stops affecting results |
 
 
+### Reflection
 
 Our dashboard presents a clean, well-organized layout that guides users through the data in a logical way. It allows the user to explore the relationship between students (specifically undergraduate and graduate students) and social media usage, mental health, sleep, and academic performance. Starting from the top of the dashboard, summarized statistics are presented for quick overview, and support any granular exploration across many countries and platforms. Then various charts are presented for a more detailed analysis. Current limitations is the size of the dataset. Our dataset is relatively small and the charts generated may not generalized broadly so user needs to proceed with caution. Additionally, with current limitation on Plotly sunburst labels layout, we are unable to fix the tiny labels on the chart. However, if user hover on top of the each section of the chart, they will be able to see the details. 
 
