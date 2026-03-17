@@ -30,10 +30,9 @@ Run the below command to download the dataset:
 ```bash
 python src/download_data.py
 ```
-To run the shiny app locally, navigate and run shiny with the following command:
+To run the shiny app locally, navigate to the project root directory and run shiny with the following command:
 ```bash
-cd src/
-shiny run app.py
+shiny run src/app.py
 ```
 You will be able to access the app at the link displayed in the command line.
 
@@ -48,6 +47,7 @@ https://019ca127-fdc0-0c6d-1031-e1462c7abb05.share.connect.posit.cloud/
 ## Running Tests
 
 This project includes both:
+
 - **Unit tests** for core dashboard logic in `src/logic.py`
 - **Playwright end-to-end tests** for key dashboard interactions in the running Shiny app
 
@@ -83,11 +83,11 @@ From the project root directory, run:
 ```bash
 PYTHONPATH=. shiny run src/app.py
 ```
-
 ```bash
 PYTHONPATH=. pytest -q
 ```
 This command runs both:
+
 - unit tests (tests/test_logic.py)
 - Playwright UI tests (tests/test_dashboard_playwright.py)
 
@@ -102,28 +102,6 @@ Run only Playwright end-to-end tests
 ```bash
 PYTHONPATH=. pytest tests/test_dashboard_playwright.py -q
 ```
-
-
-### What the tests cover
-## Unit tests
-
-| Test | Behavior verified | What breaks if it changes |
-|------|-------------------|--------------------------|
-| `test_apply_dashboard_filters_combines_sidebar_filters_correctly` | Multiple sidebar filters correctly narrow the dataset | Dashboard may show incorrect subsets of students |
-| `test_apply_dashboard_filters_clicked_country_overrides_to_single_country` | Clicking a country on the map correctly filters the dataset| Map interaction stops affecting dashboard results|
-| `test_summarize_country_metrics_returns_expected_counts_and_means` | Country-level aggregation produces correct counts and averages |Choropleth map statistics become incorrect |
-| `test_group_platforms_for_sunburst_groups_small_categories_into_other` |Low-frequency platforms are grouped into "Other" | Sunburst visualization becomes cluttered or misleading |
-| `test_get_iso3_returns_none_for_unknown_country` | test_get_iso3_returns_none_for_unknown_country | Map rendering could crash when ISO codes cannot be resolved |
-
-## Playwright end-to-end tests
-
-| Test | Behavior verified | What breaks if it changes |
-|------|-------------------|--------------------------|
-| `test_dashboard_loads_and_shows_initial_clicked_country` | Dashboard loads and starts with no clicked-country filter | Initial app state or reactive outputs may fail |
-| `test_gender_filter_changes_total_students_tile` | Changing the gender filter updates KPI outputs| Filter reactivity breaks|
-| `test_academic_level_filter_changes_total_students_tile` | Changing academic level updates KPI values |Aggregations stop reflecting filter state |
-| `test_country_filter_changes_total_students_tile` |Selecting a country updates dashboard totals | Country filtering stops affecting results |
-
 
 ## Notes
 - Tests must be executed from the project root directory.
