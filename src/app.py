@@ -7,7 +7,7 @@ Open:     http://127.0.0.1:8000
 
 # ── IMPORTS ───────────────────────────────────────────────────────────
 
-from src.logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
+from logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
 import pandas as pd
 import plotly.express as px
 import pycountry
