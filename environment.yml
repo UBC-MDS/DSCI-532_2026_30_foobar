@@ -1,5 +1,5 @@
 # conda env create -f environment.yml
-name: "532"
+name: "532-social-media-addiction"
 channels:
   - conda-forge
   - defaults
@@ -16,8 +16,12 @@ dependencies:
   - pycountry>=22.3.5
   - python-dotenv>=1.0.1
   - pip
+  - pytest
+  - pytest-playwright
+  - playwright
   - pip:
     - kagglehub
     - vl-convert-python
     - querychat
     - anthropic
+    - ibis-framework[duckdb]
