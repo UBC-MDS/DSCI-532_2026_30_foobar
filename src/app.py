@@ -7,7 +7,7 @@ Open:     http://127.0.0.1:8000
 
 # ── IMPORTS ───────────────────────────────────────────────────────────
 
-from logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
+from src.logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
 import pandas as pd
 import plotly.express as px
 import pycountry
@@ -376,7 +376,6 @@ def server(input, output, session):
 
     # ── Filtered data ────────────────────────────────────────────────
     @reactive.calc
-    @reactive.calc
     def filtered_df():
         clicked_country = selected_country_map.get()
         
@@ -456,18 +455,7 @@ def server(input, output, session):
     def map_chart():
         d = filtered_df().copy()
 
-        df_selected = d.groupby("Country", as_index=False).agg({
-            "Student_ID": "count",
-            "Avg_Daily_Usage_Hours": "mean",
-            "Sleep_Hours_Per_Night": "mean",
-            "Addicted_Score": "mean",
-        })
 
-        def get_iso3(country_name):
-            try:
-                return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
-            except Exception:
-                return None
 
        # df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
         #df_selected = df_selected.dropna(subset=["iso_alpha"])

@@ -79,6 +79,11 @@ python -m playwright install
 Run all tests (single command)
 
 From the project root directory, run:
+
+```bash
+PYTHONPATH=. shiny run src/app.py
+```
+
 ```bash
 PYTHONPATH=. pytest -q
 ```

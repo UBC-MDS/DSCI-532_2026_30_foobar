@@ -24,11 +24,25 @@ def shiny_app():
 def wait_for_non_empty_text(locator, page, timeout_ms=10000):
     start = time.time()
     while time.time() - start < timeout_ms / 1000:
-        text = locator.inner_text().strip()
+        text = locator.text_content()
+        text = text.strip() if text else ""
         if text != "":
             return text
         page.wait_for_timeout(250)
-    return locator.inner_text().strip()
+    text = locator.text_content()
+    return text.strip() if text else ""
+
+
+def wait_for_text_change(locator, old_text, page, timeout_ms=10000):
+    start = time.time()
+    while time.time() - start < timeout_ms / 1000:
+        text = locator.text_content()
+        text = text.strip() if text else ""
+        if text != "" and text != old_text:
+            return text
+        page.wait_for_timeout(250)
+    text = locator.text_content()
+    return text.strip() if text else ""
 
 
 def test_dashboard_loads_and_shows_initial_clicked_country(page):
@@ -50,10 +64,9 @@ def test_gender_filter_changes_total_students_tile(page):
     tile = page.locator('[data-testid="tile-students"]')
     before = wait_for_non_empty_text(tile, page)
 
-    page.get_by_role("radio", name="Male", exact=True).check()
-    page.wait_for_timeout(1500)
+    page.locator('input[name="f_gender"][value="Male"]').check()
 
-    after = wait_for_non_empty_text(tile, page)
+    after = wait_for_text_change(tile, before, page)
 
     assert before != ""
     assert after != ""
@@ -69,9 +82,8 @@ def test_academic_level_filter_changes_total_students_tile(page):
     before = wait_for_non_empty_text(tile, page)
 
     page.locator("#f_level").select_option("Graduate")
-    page.wait_for_timeout(1500)
 
-    after = wait_for_non_empty_text(tile, page)
+    after = wait_for_text_change(tile, before, page)
 
     assert before != ""
     assert after != ""
@@ -86,13 +98,11 @@ def test_country_filter_changes_total_students_tile(page):
     tile = page.locator('[data-testid="tile-students"]')
     before = wait_for_non_empty_text(tile, page)
 
-    country_container = page.locator("#f_country").locator("..")
-    country_container.click()
+    page.locator(".selectize-input").nth(0).click()
     page.keyboard.type("Canada")
     page.keyboard.press("Enter")
-    page.wait_for_timeout(1500)
 
-    after = wait_for_non_empty_text(tile, page)
+    after = wait_for_text_change(tile, before, page)
 
     assert before != ""
     assert after != ""
