@@ -7,6 +7,7 @@ Open:     http://127.0.0.1:8000
 
 # ── IMPORTS ───────────────────────────────────────────────────────────
 
+from logic import apply_dashboard_filters, summarize_country_metrics, group_platforms_for_sunburst, get_iso3
 import pandas as pd
 import plotly.express as px
 import pycountry
@@ -60,6 +61,7 @@ _platforms = sorted(
 load_dotenv()
 greeting = "Hello! Welcome to your Social Media Addiction data dashboard. I'm here to help you filter, sort, and analyze the data."
 _df_for_qc = students.execute()
+students_df = _df_for_qc.copy()
 qc = QueryChat(_df_for_qc, "df", greeting=greeting, client="anthropic/claude-3-haiku-20240307")
 
 # ── UI ───────────────────────────────────────────────────────────────
@@ -224,7 +226,9 @@ app_ui = ui.page_fluid(
 
                     ui.div(
                        ui.output_text("selected_country_text"),
-                       id="selected_country_text"
+                       id="selected_country_text",
+                       **{"data-testid": "selected-country-text"}
+                       
                       ),
 
 
@@ -238,23 +242,23 @@ app_ui = ui.page_fluid(
                 ui.layout_columns(
                     ui.value_box(
                         title="Total Students",
-                        value=ui.output_text("tile_students"),
-                        showcase=ui.HTML('<i class="fa-solid fa-graduation-cap" style="font-size:3rem"></i>')
-                    ),
+                         value=ui.div(ui.output_text("tile_students"), **{"data-testid": "tile-students"}),
+                         showcase=ui.HTML('<i class="fa-solid fa-graduation-cap" style="font-size:3rem"></i>')
+                             ),
                     ui.value_box(
                         title="Avg Daily Usage",
-                        value=ui.output_text("tile_usage"),
-                        showcase=ui.HTML('<i class="fa-solid fa-display" style="font-size:3rem"></i>')
-                    ),
+                         value=ui.div(ui.output_text("tile_usage"), **{"data-testid": "tile-usage"}),
+                         showcase=ui.HTML('<i class="fa-solid fa-display" style="font-size:3rem"></i>')
+                         ),
                     ui.value_box(
-                        title="Avg Sleep Hours",
-                        value=ui.output_text("tile_sleep"),
-                        showcase=ui.HTML('<i class="fa-solid fa-bed" style="font-size:3rem"></i>')
-                    ),
+                          title="Avg Sleep Hours",
+                          value=ui.div(ui.output_text("tile_sleep"), **{"data-testid": "tile-sleep"}),
+                          showcase=ui.HTML('<i class="fa-solid fa-bed" style="font-size:3rem"></i>')
+                        ),
                     ui.value_box(
                         title="Avg Addiction Score",
-                        value=ui.output_text("tile_addiction"),
-                        showcase=ui.HTML('<i class="fa-solid fa-circle-exclamation" style="font-size:3rem"></i>')
+                         value=ui.div(ui.output_text("tile_addiction"), **{"data-testid": "tile-addiction"}),
+                         showcase=ui.HTML('<i class="fa-solid fa-circle-exclamation" style="font-size:3rem"></i>')
                     ),
                     fill=False,
                 ),
@@ -372,31 +376,21 @@ def server(input, output, session):
 
     # ── Filtered data ────────────────────────────────────────────────
     @reactive.calc
+    @reactive.calc
     def filtered_df():
-        expr = students.filter(students.Academic_Level.isin(["Undergraduate", "Graduate"]))
-
-        if input.f_gender() != "All":
-            expr = expr.filter(expr.Gender == input.f_gender())
-
-        age_low, age_high = input.f_age()
-        expr = expr.filter(expr.Age.between(age_low, age_high))
-
-        if input.f_level() != "All":
-            expr = expr.filter(expr.Academic_Level == input.f_level())
-
-        if input.f_country():
-            expr = expr.filter(expr.Country.isin(list(input.f_country())))
-
-        if input.f_platform():
-            expr = expr.filter(expr.Most_Used_Platform.isin(list(input.f_platform())))
-
-        # Filter by clicked country from the map
         clicked_country = selected_country_map.get()
-        if clicked_country is not None:
-            expr = expr.filter(expr.Country == clicked_country)
-
-        return expr.execute()
-
+        
+        return apply_dashboard_filters(
+            students_df,
+            gender=input.f_gender(),
+            age_range=input.f_age(),
+            academic_level=input.f_level(),
+            countries=list(input.f_country()) if input.f_country() else None,
+            platforms=list(input.f_platform()) if input.f_platform() else None,
+            clicked_country=clicked_country,
+            )
+    
+    
     # ── Clicked country display ──────────────────────────────────────
     @render.text
     def selected_country_text():
@@ -474,6 +468,10 @@ def server(input, output, session):
                 return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
             except Exception:
                 return None
+
+       # df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
+        #df_selected = df_selected.dropna(subset=["iso_alpha"])
+        df_selected = summarize_country_metrics(d)
 
         df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
         df_selected = df_selected.dropna(subset=["iso_alpha"])
@@ -663,12 +661,15 @@ def server(input, output, session):
     # ── Chart 4: Platform distribution ───────────────────────────────
     @render_plotly
     def sunburst_platform():
-        d = filtered_df()
-        platform_counts = (
-            d.groupby(["Gender", "Most_Used_Platform"])
-            .agg(Count=("Gender", "size"))
-            .reset_index()
-        )
+       # d = filtered_df()
+        #platform_counts = (
+        #    d.groupby(["Gender", "Most_Used_Platform"])
+        #    .agg(Count=("Gender", "size"))
+        #    .reset_index()
+        #)
+        
+        platform_counts = group_platforms_for_sunburst(d, top_n=6)
+
 
         color_map = {
             "Facebook": "#1e3a6e",
@@ -688,19 +689,26 @@ def server(input, output, session):
             "Male": "#1e3a6e",
         }
 
-        top_platforms = (
-            platform_counts.groupby("Most_Used_Platform")["Count"]
-            .sum()
-            .nlargest(6)
-            .index
-        )
+        #top_platforms = (
+        #    platform_counts.groupby("Most_Used_Platform")["Count"]
+        #    .sum()
+        #    .nlargest(6)
+        #    .index
+        #)
 
-        platform_counts["Platform_Group"] = platform_counts["Most_Used_Platform"].apply(
-            lambda x: x if x in top_platforms else "Other"
-        )
+        #platform_counts["Platform_Group"] = platform_counts["Most_Used_Platform"].apply(
+        #    lambda x: x if x in top_platforms else "Other"
+        #)
 
-        total = int(platform_counts["Count"].sum())
-        platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).astype(str) + "%"
+        #total = int(platform_counts["Count"].sum())
+        #platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).astype(str) + "%"
+        total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
+        platform_counts["Percentage"] = (
+            (platform_counts["Count"] / total * 100).astype(str) + "%"
+            if total > 0
+            else []
+            )
+        
 
         fig = px.sunburst(
             platform_counts,

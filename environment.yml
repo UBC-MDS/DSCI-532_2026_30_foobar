@@ -16,6 +16,9 @@ dependencies:
   - pycountry>=22.3.5
   - python-dotenv>=1.0.1
   - pip
+  -pytest
+  -pytest-playwright
+  -playwright
   - pip:
     - kagglehub
     - vl-convert-python
