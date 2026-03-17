@@ -391,6 +391,8 @@ def server(input, output, session):
     @render_altair
     def scatter_chart():
         d = filtered_df()
+        if d.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
@@ -420,6 +422,11 @@ def server(input, output, session):
     @render_plotly
     def map_chart():
         d = filtered_df().copy()
+        if d.empty:
+            fig = go.Figure()
+            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
+            fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+            return fig
         
         df_selected = d.groupby("Country", as_index=False).agg({
             "Student_ID": "count",
@@ -493,6 +500,8 @@ def server(input, output, session):
     @render_altair
     def plot_AAP():
         df1 = filtered_df()
+        if df1.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
         #calculate the percentage
         percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
@@ -517,6 +526,10 @@ def server(input, output, session):
     @render_plotly
     def donut_academic_level():
         d = filtered_df()
+        if d.empty:
+            fig = go.Figure()
+            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
+            return fig
 
         level_counts = (
             d.groupby("Academic_Level")
@@ -573,6 +586,8 @@ def server(input, output, session):
     @render_altair
     def plot_academiclvldist():
         df = filtered_df()
+        if df.empty:
+            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -603,6 +618,11 @@ def server(input, output, session):
     @render_plotly
     def sunburst_platform():
         d = filtered_df()
+        if d.empty:
+            fig = go.Figure()
+            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
+            fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
+            return fig
         platform_counts = (
             d.groupby(["Gender", "Most_Used_Platform"])
             .agg(Count=("Gender", "size"))
