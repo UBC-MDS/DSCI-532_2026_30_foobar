@@ -426,8 +426,6 @@ def server(input, output, session):
     @render_altair
     def scatter_chart():
         d = filtered_df()
-        if d.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
@@ -456,27 +454,15 @@ def server(input, output, session):
     @render_plotly
     def map_chart():
         d = filtered_df().copy()
-        if d.empty:
-            fig = go.Figure()
-            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
-            fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-            return fig
-        
-        df_selected = d.groupby("Country", as_index=False).agg({
-            "Student_ID": "count",
-            "Avg_Daily_Usage_Hours": "mean",
-            "Sleep_Hours_Per_Night": "mean",
-            "Addicted_Score": "mean",
-        })
 
-        def get_iso3(country_name):
-            try:
-                return pycountry.countries.search_fuzzy(country_name)[0].alpha_3
-            except:
-                return None # Handle unrecognized countries
 
-        df_selected['iso_alpha'] = df_selected['Country'].apply(get_iso3)
-        df_selected = df_selected.dropna(subset=['iso_alpha'])
+
+       # df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
+        #df_selected = df_selected.dropna(subset=["iso_alpha"])
+        df_selected = summarize_country_metrics(d)
+
+        df_selected["iso_alpha"] = df_selected["Country"].apply(get_iso3)
+        df_selected = df_selected.dropna(subset=["iso_alpha"])
 
         all_iso = [c.alpha_3 for c in pycountry.countries]
         no_data_iso = [iso for iso in all_iso if iso not in df_selected["iso_alpha"].values]
@@ -552,10 +538,7 @@ def server(input, output, session):
     @render_altair
     def plot_AAP():
         df1 = filtered_df()
-        if df1.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
-        #calculate the percentage
-        percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
+        percent = df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count")
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
         percent["label"] = percent["Percentage"].astype(str) + "%"
 
@@ -583,10 +566,6 @@ def server(input, output, session):
     @render_plotly
     def donut_academic_level():
         d = filtered_df()
-        if d.empty:
-            fig = go.Figure()
-            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
-            return fig
 
         level_counts = (
             d.groupby("Academic_Level")
@@ -641,8 +620,6 @@ def server(input, output, session):
     @render_altair
     def plot_academiclvldist():
         df = filtered_df()
-        if df.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -673,33 +650,52 @@ def server(input, output, session):
     @render_plotly
     def sunburst_platform():
         d = filtered_df()
-        if d.empty:
-            fig = go.Figure()
-            fig.add_annotation(text="No data available", x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, font=dict(size=20, color="gray"))
-            fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
-            return fig
-        platform_counts = (
-            d.groupby(["Gender", "Most_Used_Platform"])
-            .agg(Count=("Gender", "size"))
-            .reset_index()
-        )
+        #platform_counts = (
+        #    d.groupby(["Gender", "Most_Used_Platform"])
+        #    .agg(Count=("Gender", "size"))
+        #    .reset_index()
+        #)
+        
+        platform_counts = group_platforms_for_sunburst(d, top_n=6)
 
-        color_map = {"Facebook":  "#1e3a6e",
-                    "Instagram": "#2d6be4",
-                    "KakaoTalk": "#5ba4cf",
-                    "LINE":      "#4f6bed",
-                    "LinkedIn":  "#7b8fab",
-                    "Snapchat":  "#a8b8cc",
-                    "TikTok":    "#0f1f3d",
-                    "Twitter":   "#3a5a9e",
-                    "VKontakte": "#6d8fc0",
-                    "WeChat":    "#b8c8e0",
-                    "WhatsApp":  "#d0dff0",
-                    "YouTube":   "#bfd4e8",
-                    "Other":     "#4a5a6e",
-                    "Female":    "#5ba4cf", 
-                    "Male":      "#1e3a6e",
-                }
+
+        color_map = {
+            "Facebook": "#1e3a6e",
+            "Instagram": "#2d6be4",
+            "KakaoTalk": "#5ba4cf",
+            "LINE": "#4f6bed",
+            "LinkedIn": "#7b8fab",
+            "Snapchat": "#a8b8cc",
+            "TikTok": "#0f1f3d",
+            "Twitter": "#3a5a9e",
+            "VKontakte": "#6d8fc0",
+            "WeChat": "#b8c8e0",
+            "WhatsApp": "#d0dff0",
+            "YouTube": "#bfd4e8",
+            "Other": "#4a5a6e",
+            "Female": "#5ba4cf",
+            "Male": "#1e3a6e",
+        }
+
+        #top_platforms = (
+        #    platform_counts.groupby("Most_Used_Platform")["Count"]
+        #    .sum()
+        #    .nlargest(6)
+        #    .index
+        #)
+
+        #platform_counts["Platform_Group"] = platform_counts["Most_Used_Platform"].apply(
+        #    lambda x: x if x in top_platforms else "Other"
+        #)
+
+        #total = int(platform_counts["Count"].sum())
+        #platform_counts["Percentage"] = (platform_counts["Count"] / total * 100).astype(str) + "%"
+        total = int(platform_counts["Count"].sum()) if len(platform_counts) else 0
+        platform_counts["Percentage"] = (
+            (platform_counts["Count"] / total * 100).astype(str) + "%"
+            if total > 0
+            else []
+            )
         
 
         fig = px.sunburst(
@@ -742,10 +738,7 @@ def server(input, output, session):
     @render_altair
     def plot_AAP_bot():
         df1 = qc_data.df()
-        if df1.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
-        #calculate the percentage
-        percent = (df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count"))
+        percent = df1.groupby("Affects_Academic_Performance").size().reset_index(name="Count")
         percent["Percentage"] = (percent["Count"] / percent["Count"].sum() * 100).round(1)
         percent["label"] = percent["Percentage"].astype(str) + "%"
 
@@ -772,8 +765,6 @@ def server(input, output, session):
     @render_altair
     def plot_academiclvldist_bot():
         df = qc_data.df()
-        if df.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=200)
 
         group_gender_df = df.groupby(["Academic_Level", "Gender"]).size().reset_index(name="Count")
 
@@ -803,8 +794,6 @@ def server(input, output, session):
     @render_altair
     def scatter_chart_bot():
         d = qc_data.df()
-        if d.empty:
-            return alt.Chart(pd.DataFrame({"x": [0.5], "y": [0.5], "text": ["No data available"]})).mark_text(size=20, color="gray").encode(x=alt.X("x:Q", axis=None), y=alt.Y("y:Q", axis=None), text="text:N").properties(width="container", height=300)
         fig = alt.Chart(d).transform_calculate(
             jitter_addiction="datum.Addicted_Score + 0.4 * (random() + random() - 1)",
             jitter_mental="datum.Mental_Health_Score + 0.4 * (random() + random() - 1)"
