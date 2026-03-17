@@ -55,7 +55,7 @@ All tests can be executed with a single command.
 
 ---
 
-## 1. Activate the project environment
+## Activate the project environment if not yet activated
 
 ```bash
 conda activate 532-social-media-addiction

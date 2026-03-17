@@ -661,7 +661,7 @@ def server(input, output, session):
     # ── Chart 4: Platform distribution ───────────────────────────────
     @render_plotly
     def sunburst_platform():
-       # d = filtered_df()
+        d = filtered_df()
         #platform_counts = (
         #    d.groupby(["Gender", "Most_Used_Platform"])
         #    .agg(Count=("Gender", "size"))
