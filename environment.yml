@@ -17,8 +17,8 @@ dependencies:
   - python-dotenv>=1.0.1
   - pip
   - pytest
-  - pytest-playwright
   - playwright
+  - pytest-playwright
   - pip:
     - kagglehub
     - vl-convert-python
